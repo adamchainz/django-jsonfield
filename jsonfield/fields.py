@@ -4,11 +4,13 @@ from django.utils import simplejson as json
  
 class JSONWidget(forms.Textarea):
     def render(self, name, value, attrs=None):
+        if value is None:
+            value = ""
         if not isinstance(value, basestring):
             value = json.dumps(value, indent=2)
         return super(JSONWidget, self).render(name, value, attrs)
 
-class JSONListWidget(forms.SelectMultiple):
+class JSONSelectWidget(forms.SelectMultiple):
     pass
 
 class JSONFormField(forms.CharField):
@@ -24,9 +26,9 @@ class JSONFormField(forms.CharField):
         widget. So, if we have an object that isn't a string, then for now
         we will assume that is where it has come from.
         """
-        if not value or value == "null": 
+        if not value: 
             return
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, basestring):
             try:
                 return json.loads(value)
             except Exception, exc:
@@ -36,8 +38,13 @@ class JSONFormField(forms.CharField):
 
 
 class JSONField(models.TextField):
+    """
+    A field that will ensure the data entered into it is valid JSON.
+    """
     __metaclass__ = models.SubfieldBase
-
+    
+    description = "JSON object"
+    
     def formfield(self, **kwargs):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
 
@@ -49,10 +56,17 @@ class JSONField(models.TextField):
     def get_db_prep_save(self, value):
         if value is None: return
         return json.dumps(value)
+    
+    def get_db_prep_value(self, value):
+        return self.get_db_prep_save(value)
 
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
-        return self.get_db_prep_value(value)
+        # Currently just returning the actual value, since otherwise I
+        # get a string when I serialize this object, when I really want a
+        # data structure.
+        # return self.get_db_prep_value(value)
+        return value
 
 
 try:
