@@ -1,0 +1,77 @@
+<script type="text/x-jquery-tmpl" id="table-template">
+    <table border="1" label="{{= label }}" class="json-data-table">
+        <tr class="header-row">
+            <th>
+                {{= label }}
+            </th>
+            {{each(i, column) headers.columnHeaders}}
+                {{tmpl({column:column, column_id:i}) "column-header"}}
+            {{/each}}
+            <th class="add-column">
+                <button>Add {{= defaults.columnName }}</button>
+            </th>
+        </tr>
+        {{each(i, row) headers.rowHeaders}}
+            {{tmpl({row:row, headers:headers, data:data, label:label, row_id:i}) "row"}}
+        {{/each}}
+        <tr><th><button class="add-row">Add {{= defaults.rowName }}</button></th></tr>
+    </table>
+</script>
+
+<script type="text/x-jquery-tmpl" id="column-header-template">
+    <th class="column-header">
+        {{tmpl({column:column, column_id:column_id}) "column-header-widget"}}
+    </th>
+</script>
+
+
+<script type="text/x-jquery-tmpl" id="row-template">
+<tr class="data-row">
+    <th class="row-header">
+        {{tmpl({row:row, row_id:row_id}) "row-header-widget"}}
+    </th>
+    {{each(j, column) headers.columnHeaders}}
+        {{tmpl({data:data, row:row, column:column, table:label, row_id:row_id, column_id:j}) "cell"}}
+    {{/each}}
+</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="row-header-widget-template">
+    {{if row.match(/,/)}}
+        <select class="fragment">
+            {{each [{i:-1,v:'under'},{i:0,v:'at'},{i:1,v:'over'}]}}
+                <option value="${i}" {{if row.match(RegExp("^"+i))}}selected="selected"{{/if}}>${v}</option>
+            {{/each}}
+        </select>
+        <input type="number" value="${ row.split(/,/)[1] }" class="fragment">
+    {{else}}
+        ${ row }
+    {{/if}}
+    <input type="hidden" value="{{= row }}" row_id="{{= row_id }}">
+</script>
+
+<script type="text/x-jquery-tmpl" id="column-header-widget-template">
+    {{if column.match(/;/)}}
+        <select class="fragment" multiple="multiple">
+            {{each(idx, day) ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]}}
+                <option value="{{= idx}}" {{if column.split(/;/)[0].match(RegExp(idx))}} selected="selected"{{/if}}>{{= day }}</option>
+            {{/each}}
+        </select>
+        <input type="time" value="{{= column.split(';')[1] }}" class="fragment">
+        <input type="time" value="{{= column.split(';')[2] }}" class="fragment">
+    {{else}}
+        {{= column }}
+    {{/if}}
+    <input type="hidden" value="{{= column }}" column_id="{{= column_id }}">
+</script>
+
+
+<script type="text/x-jquery-tmpl" id="cell-template">
+    <td>
+    <input 
+        type="text" value="{{if data[row]}}{{= data[row][column] }}{{/if}}" class="cell-value"
+        row="{{= row }}" column="{{= column }}" table="{{= table }}"
+        row_id="{{= row_id }}" column_id="{{= column_id }}"
+    >
+    </td>
+</script>
