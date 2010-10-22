@@ -1,8 +1,15 @@
 from django.db import models
 from django import forms
 from django.utils import simplejson as json
+from decimal import Decimal
 
 from forms import JSONFormField
+
+def default(o):
+    if isinstance(o, Decimal):
+        return str(o)
+    raise TypeError(repr(o) + " is not JSON serializable")
+
 
 class JSONField(models.TextField):
     """
@@ -23,7 +30,7 @@ class JSONField(models.TextField):
     def get_db_prep_save(self, value):
         if value is None: 
             return None
-        return json.dumps(value)
+        return json.dumps(value, default=default)
     
     def get_db_prep_value(self, value):
         return self.get_db_prep_save(value)

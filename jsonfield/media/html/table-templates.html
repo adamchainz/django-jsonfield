@@ -37,7 +37,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="row-header-widget-template">
-    {{if row.match(/,/)}}
+    {{if row.match(/,/) || row == ""}}
         <select class="fragment">
             {{each [{i:-1,v:'under'},{i:0,v:'at'},{i:1,v:'over'}]}}
                 <option value="${i}" {{if row.match(RegExp("^"+i))}}selected="selected"{{/if}}>${v}</option>
@@ -47,22 +47,50 @@
     {{else}}
         ${ row }
     {{/if}}
-    <input type="hidden" value="{{= row }}" row_id="{{= row_id }}">
+    <input type="hidden" value="{{= row }}" row_id="{{= row_id }}" class="heading-value">
 </script>
 
 <script type="text/x-jquery-tmpl" id="column-header-widget-template">
-    {{if column.match(/;/)}}
-        <select class="fragment" multiple="multiple">
-            {{each(idx, day) ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]}}
-                <option value="{{= idx}}" {{if column.split(/;/)[0].match(RegExp(idx))}} selected="selected"{{/if}}>{{= day }}</option>
-            {{/each}}
-        </select>
-        <input type="time" value="{{= column.split(';')[1] }}" class="fragment">
-        <input type="time" value="{{= column.split(';')[2] }}" class="fragment">
+    {{if column.match(/;/) || column == ""}}
+        <div>
+            <select class="fragment" onchange="$(this).closest('div').siblings().hide().end().siblings('.'+$(this).val()).show();">
+                {{each(idx,type) {day:"On the day(s)",every:"Every"} }}
+                    <option value="{{= idx }}" {{if column.split(/;/)[0] == type}}selected="selected"{{/if}}>
+                        {{= type}}
+                    </option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="day" {{if !column.match(/^(day);/)}} style="display:none;"{{/if}}>
+            <select class="fragment" multiple="multiple">
+                {{each(idx, day) ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]}}
+                    <option value="{{= idx}}" {{if column.match(/^day/) && column.split(/;/)[1].match(RegExp(idx))}} selected="selected"{{/if}}>{{= day }}</option>
+                {{/each}}
+            </select>
+            between
+            <input type="time" value="{{if column.match(/^day/)}}{{= column.split(';')[2] }}{{else}}00:00{{/if}}" class="fragment">
+            and
+            <input type="time" value="{{if column.match(/^day/)}}{{= column.split(';')[3] }}{{else}}00:00{{/if}}" class="fragment">
+            (select 00:00 - 00:00 for all day)
+        </div>
+
+        <div class="every" {{if !column.match(/^(every);/)}} style="display:none;"{{/if}}>
+            <input type="number" value="{{if column.match(/^every/)}}{{= column.split(/;/)[1]}}{{else}}1{{/if}}" class="fragment">
+            <select class="fragment">
+                {{each(idx,type) ["shift","day","week","month"]}}
+                    <option value="{{= type}}" {{if column.match(/^every/) && column.split(/;/)[2] == type}}selected="selected"{{/if}}>
+                        {{= type}}(s)
+                    </option>
+                {{/each}}
+            </select>
+            where hours worked exceeds
+            <input type="number" value="{{if column.match(/^every/)}}{{= column.split(/;/)[3]}}{{else}}0{{/if}}" class="fragment">
+        </div>
+
     {{else}}
-        {{= column }}
+        {{= column}}
     {{/if}}
-    <input type="hidden" value="{{= column }}" column_id="{{= column_id }}">
+    <input type="hidden" value="{{= column }}" column_id="{{= column_id }}" class="heading-value">
 </script>
 
 

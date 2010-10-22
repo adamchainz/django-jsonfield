@@ -1,5 +1,5 @@
 function DEBUG(msg){
-    // console.log(msg);
+    console.log(msg);
 }
 
 function jsonTable(dataSource, options){
@@ -19,7 +19,8 @@ function jsonTable(dataSource, options){
         },
         defaultRowHeaderValue: "",
         defaultColumnHeaderValue: "",
-        display: "inline"
+        display: "inline",
+        stripEmptyData: true
     };
     
     $.extend(defaults, options);
@@ -46,21 +47,45 @@ function jsonTable(dataSource, options){
             $tables = $.tmpl('table', templateData()).appendTo('body');
         }
     }
-    
-    function updateSourceFromData(){
-        data = {};
+    function getDataFromTable(){
+        var newData = {};
         $tables.find('input.cell-value').each(function(i, el){
             $el = $(el);
-            if ($el.val()){
+            // if ($el.val()){
                 var table = $el.attr('table');
                 var row = $el.attr('row');
                 var column = $el.attr('column');
-                pathValue(data, [table, row], column, $el.val());
-            }
+                pathValue(newData, [table, row], column, $el.val());
+            // }
         });
-        
+        return newData;
+    }
+    
+    function stripEmptyData(){
+        $.each(data, function(label, table){
+            $.each(table, function(row, rowData){
+                $.each(rowData, function(column, value){
+                    if (!value){
+                        delete rowData[column];
+                    }
+                });
+                if ($.isEmptyObject(rowData)){
+                    delete table[row];
+                }
+            });
+            if ($.isEmptyObject(table)){
+                delete data[label];
+            };
+        });
+    }
+    
+    function updateSourceFromData(){
+        data = getDataFromTable();
         runValidations();
         
+        if (defaults.stripEmptyData){
+            stripEmptyData();
+        }
         if (!errors.length){
             $dataSource.val(JSON.stringify(data, null, defaults.jsonIndent));
         }
@@ -74,10 +99,12 @@ function jsonTable(dataSource, options){
     }
     
     function updateErrors(){
-        $tables.find('tr, td, th').removeClass('error');
-        
+        $tables.find('tr, td, th').removeClass('errors');
+        $tables.find('.errormsg').detach();
+        // DEBUG(errors);
         $.each(errors, function(i,el){
-            $($(el).selector).addClass("error");
+            $($(el).selector).addClass("errors");
+            $($(el).selector).children().first().before('<div style="color:red;" class="errormsg">' + el.reason + "</div>")
         });
     }
     
@@ -154,12 +181,13 @@ function jsonTable(dataSource, options){
     function headerChanged(kind, sep, innerSep){
         return function(evt){
             var $th = $(this).closest('th');
-            var $value = $th.find('input:hidden');
+            var $value = $th.find('input:hidden.heading-value');
             var kind_id = $value.attr(kind + '_id');
-            var newValue = combineFields($th.find('.fragment'), sep, innerSep);
+            var newValue = combineFields($th.find('.fragment').not(':hidden'), sep, innerSep);
             $th.closest('table').find('input[' + kind + '_id="' + kind_id + '"]').attr(kind, newValue);
             $value.val(newValue);
             updateSourceFromData();
+            // DEBUG(newValue);
         };
     }
     var rowHeaderChanged = headerChanged('row', ',', '');
@@ -178,6 +206,7 @@ function jsonTable(dataSource, options){
         // Disable adding a new row until this one has been edited.
         // $(this).attr('disabled','disabled');
         runValidations();
+        return false;
     }
     
     function addColumn(evt){
@@ -185,7 +214,7 @@ function jsonTable(dataSource, options){
         var $table = $(this).closest('table');
         var label = $table.attr('label');
         var column = defaults.defaultColumnHeaderValue;
-        var column_id = $table.find('tr.header-now th.column-header').length;
+        var column_id = $table.find('tr.header-row th.column-header').length;
         $.tmpl('column-header', {
             column: column,
             column_id: column_id
@@ -202,6 +231,7 @@ function jsonTable(dataSource, options){
             }).appendTo($(el));
         });
         runValidations();
+        return false;
     }
     
     function preValidate(){
@@ -225,6 +255,7 @@ function jsonTable(dataSource, options){
             });
             $table.find('th.row-header').each(function(j,row){
                 $this = $(row).find('input:hidden');
+                // DEBUG($this.val());
                 selector = $table.find('th.row-header input:hidden[value="'+ $this.val() + '"]').not($this).closest('th');
                 if (selector.length){
                     errors.push({
@@ -239,7 +270,11 @@ function jsonTable(dataSource, options){
     }
     
     // Load the templates for performance reasons.
-    
+    function loadTemplates(){
+        // TODO: Load the templates here.
+        // Perhaps embed the templates, but then override them if there is
+        // a DOM element that matches the name?
+    }
     $('#table-template').template('table');
     $('#row-template').template('row');
     $('#column-header-template').template('column-header');
@@ -271,16 +306,23 @@ function validator(data, errors){
     $.each(data, function(label, table){
         // More than one under or over per table will conflict.
         $.each({"-1": "under", "1":"over"}, function(val, which){
-            clashes = [];
+            // DEBUG(val);
+            var clashes = [];
             $.each(table, function(row, rowData){
+                // DEBUG(rowData);
                 if (row.match(RegExp("^" + val))){
                     clashes.push(row);
                 }
             });
+            // DEBUG(clashes);
             if (clashes.length > 1){
-                errors.push({
-                    selector: $('table[label="' + label + '"] th.row-header select.fragment option[selected=selected][value="' + val + '"]').closest('th'),
-                    reason: "Duplicate " + which + " age directives clash."
+                // DEBUG(which);
+                // DEBUG(clashes);
+                $.each(clashes, function(idx, item){
+                    errors.push({
+                        selector: $('table[label="' + label + '"] th.row-header input:hidden[value="' + item + '"]').closest('th'),
+                        reason: "Duplicate " + which + " age directives clash."
+                    });
                 });
             }
         });
@@ -288,15 +330,15 @@ function validator(data, errors){
         
         
         
-        // Look for non numeric cell values. % are allowed.
+        // Look for non numeric cell values. +value is allowed.
         $.each(table, function(row, rowData){
             $.each(rowData, function(column, value){
                 var _value = $.trim(value);
-                if (!_value.match(/^\d*\.?\d*%?$/)){
+                if (!_value.match(/^\+?\d*\.?\d*$/)){
                     errors.push({
                         // Would be nice to use [value=value] here, but this does not select properly.
                         selector: $('input.cell-value[table="' + label + '"][row="' + row + '"][column="' + column + '"]').closest('td'),
-                        reason: "Invalid format for number or percentage."
+                        reason: "Invalid format for number or increment."
                     });
                 }
             });
@@ -305,22 +347,29 @@ function validator(data, errors){
 }
 
 $(function(){
+    // TODO: A better way to handle this. Currently, we are hard-coding
+    // the media path.
     $.get('/media/jsonfield/html/table-templates.html', function(data, status, xhr){
         $('body').append(data);
-        // console.log(data);
+        if (!$('#id_rates').val()){
+            $('#id_rates').val('{}');    
+        }
+        init();
     });
 });
 
 function init(){
-    jsonTable('#id_classifications-0-rates', {
+    jsonTable('#id_rates', {
         baseTableNames: ["non_casual", "casual"],
         baseRowHeaders: ['adult'],
         baseColumnHeaders: ['base', 'public_holiday'],
         rowName: "age rule",
         columnName: "condition",
-        defaultColumnHeaderValue: "0;00:00;00:00",
+        defaultColumnHeaderValue: "day;0;00:00;00:00",
         defaultRowHeaderValue: "0,0",
         customValidator: validator,
-        display: "popup"
+        display: "popup",
+        stripEmptyData: true
     });
 }
+
