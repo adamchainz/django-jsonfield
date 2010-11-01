@@ -20,4 +20,5 @@ class JSONTableWidget(JSONWidget):
             staticmedia.url('js/jquery.js'),
             staticmedia.url('js/jquery.tmpl.js'),
             staticmedia.url('js/json-table.js'),
+            staticmedia.url('js/json-table-templates.js'),
         )

@@ -9,7 +9,7 @@ function jsonTable(dataSource, options){
     var $tables;
     var errors = [];
     
-    defaults = {
+    var defaults = {
         baseTableNames: [],
         baseRowHeaders: [],
         baseColumnHeaders: [],
@@ -24,6 +24,8 @@ function jsonTable(dataSource, options){
     };
     
     $.extend(defaults, options);
+    
+    // DEBUG(defaults);
     
     function updateDataFromSource(){
         data = JSON.parse($dataSource.val());
@@ -47,6 +49,7 @@ function jsonTable(dataSource, options){
             $tables = $.tmpl('table', templateData()).appendTo('body');
         }
     }
+    
     function getDataFromTable(){
         var newData = {};
         $tables.find('input.cell-value').each(function(i, el){
@@ -92,20 +95,28 @@ function jsonTable(dataSource, options){
     }
     
     function runValidations(){
+        // DEBUG("Running validations");
         preValidate();
         findDuplicateHeaders();
         defaults.customValidator(data, errors);
         updateErrors();
+        // DEBUG("Finished running validations (" + errors.length + " errors found)");
+        // if (errors.length) {
+        //     DEBUG(errors);
+        // }
     }
     
     function updateErrors(){
         $tables.find('tr, td, th').removeClass('errors');
-        $tables.find('.errormsg').detach();
+        $tables.parent().find('.errormsg').detach();
         // DEBUG(errors);
         $.each(errors, function(i,el){
             $($(el).selector).addClass("errors");
             $($(el).selector).children().first().before('<div style="color:red;" class="errormsg">' + el.reason + "</div>")
         });
+        if (errors.length){
+            $tables.first().before('<h3 style="color:red;" class="errormsg errors">Errors prevented saving</h3>');
+        }
     }
     
     function pathValue(data, keys, last_key, value){
@@ -125,7 +136,8 @@ function jsonTable(dataSource, options){
             tdata.push({
                 label: key,
                 headers: getHeaders(val),
-                data: val
+                data: val,
+                defaults: defaults
             });
         });
         return tdata;
@@ -243,7 +255,7 @@ function jsonTable(dataSource, options){
         $tables.each(function(i, table){
             $table = $(table);
             $table.find('th.column-header').each(function(j, col){
-                $this = $(col).find('input:hidden');
+                $this = $(col).find('input:hidden.heading-value');
                 selector = $table.find('th.column-header input:hidden[value="' + $this.val() + '"]').not($this).closest('th');
                 if (selector.length){
                     errors.push({
@@ -270,20 +282,29 @@ function jsonTable(dataSource, options){
     }
     
     // Load the templates for performance reasons.
-    function loadTemplates(){
-        // TODO: Load the templates here.
-        // Perhaps embed the templates, but then override them if there is
-        // a DOM element that matches the name?
-    }
-    $('#table-template').template('table');
-    $('#row-template').template('row');
-    $('#column-header-template').template('column-header');
-    $('#column-header-widget-template').template('column-header-widget');
-    $('#row-header-widget-template').template('row-header-widget');
-    $('#cell-template').template('cell');
+    // The default templates will have already been loaded 
+    // from json-table-templates.js (also part of the media for the widget)
+    // This will override any of these where the correctly named DOM element
+    // exists.
+    var template_names = [
+        'table',
+        'row',
+        'column-header',
+        'column-header-widget',
+        'row-header-widget',
+        'cell'
+    ];
+    $.each(template_names, function(i, name){
+        if ($('#' + name + '-template').length){
+            $.template(name, $('#' + name + '-template'));
+        }
+    });
+    
+    // DEBUG($.template('column-header-widget'));
     
     updateDataFromSource();
     
+    // DEBUG('Updated Data');
     /*
     Attach all of the event handlers
     */
@@ -295,81 +316,9 @@ function jsonTable(dataSource, options){
     $('.add-column').live('click', addColumn);
     $dataSource.live('change blur', updateDataFromSource);
     
+    $dataSource.hide();
+    
     return $;
 }
 
-
-/// TESTING for award rates
-
-function validator(data, errors){
-    // DEBUG("Running custom validator");
-    $.each(data, function(label, table){
-        // More than one under or over per table will conflict.
-        $.each({"-1": "under", "1":"over"}, function(val, which){
-            // DEBUG(val);
-            var clashes = [];
-            $.each(table, function(row, rowData){
-                // DEBUG(rowData);
-                if (row.match(RegExp("^" + val))){
-                    clashes.push(row);
-                }
-            });
-            // DEBUG(clashes);
-            if (clashes.length > 1){
-                // DEBUG(which);
-                // DEBUG(clashes);
-                $.each(clashes, function(idx, item){
-                    errors.push({
-                        selector: $('table[label="' + label + '"] th.row-header input:hidden[value="' + item + '"]').closest('th'),
-                        reason: "Duplicate " + which + " age directives clash."
-                    });
-                });
-            }
-        });
-        // Check for overlapping conditions
-        
-        
-        
-        // Look for non numeric cell values. +value is allowed.
-        $.each(table, function(row, rowData){
-            $.each(rowData, function(column, value){
-                var _value = $.trim(value);
-                if (!_value.match(/^\+?\d*\.?\d*$/)){
-                    errors.push({
-                        // Would be nice to use [value=value] here, but this does not select properly.
-                        selector: $('input.cell-value[table="' + label + '"][row="' + row + '"][column="' + column + '"]').closest('td'),
-                        reason: "Invalid format for number or increment."
-                    });
-                }
-            });
-        });
-    });
-}
-
-$(function(){
-    // TODO: A better way to handle this. Currently, we are hard-coding
-    // the media path.
-    $.get('/media/jsonfield/html/table-templates.html', function(data, status, xhr){
-        $('body').append(data);
-        if (!$('#id_rates').val()){
-            $('#id_rates').val('{}');    
-        }
-        init();
-    });
-});
-
-function init(){
-    jsonTable('#id_rates', {
-        baseTableNames: ["non_casual", "casual"],
-        baseRowHeaders: ['adult'],
-        baseColumnHeaders: ['base', 'public_holiday'],
-        rowName: "age rule",
-        columnName: "condition",
-        defaultColumnHeaderValue: "day;0;00:00;00:00",
-        defaultRowHeaderValue: "0,0",
-        customValidator: validator,
-        display: "popup",
-        stripEmptyData: true
-    });
-}
 
