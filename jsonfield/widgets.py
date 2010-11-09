@@ -17,7 +17,7 @@ class JSONSelectWidget(forms.SelectMultiple):
 class JSONTableWidget(JSONWidget):
     class Media:
         js = (
-            settings.STATICFILES_URL + 'js/jquery.js',
+            settings.STATICFILES_URL + 'js/jquery.min.js',
             settings.STATICFILES_URL + 'js/jquery.tmpl.js',
             settings.STATICFILES_URL + 'js/json-table.js',
             settings.STATICFILES_URL + 'js/json-table-templates.js',
