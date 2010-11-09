@@ -1,6 +1,6 @@
 from django import forms
 from django.utils import simplejson as json
-import staticmedia
+from django.conf import settings
 
 class JSONWidget(forms.Textarea):
     def render(self, name, value, attrs=None):
@@ -17,8 +17,8 @@ class JSONSelectWidget(forms.SelectMultiple):
 class JSONTableWidget(JSONWidget):
     class Media:
         js = (
-            staticmedia.url('js/jquery.js'),
-            staticmedia.url('js/jquery.tmpl.js'),
-            staticmedia.url('js/json-table.js'),
-            staticmedia.url('js/json-table-templates.js'),
+            settings.STATICFILES_URL + 'js/jquery.js',
+            settings.STATICFILES_URL + 'js/jquery.tmpl.js',
+            settings.STATICFILES_URL + 'js/json-table.js',
+            settings.STATICFILES_URL + 'js/json-table-templates.js',
         )
