@@ -161,6 +161,13 @@ function jsonTable(dataSource, options){
         };
     }
     
+    function getVisibleHeaders($table) {
+        return {
+            rowHeaders: $table.find('th.row-header input.heading-value').map(function(i,x){return x.value}),
+            columnHeaders: $table.find('th.column-header input.heading-value').map(function(i,x){return x.value})            
+        };
+    }
+    
     function inAny(value, arrays){
         // is the value in any of the passed in arrays?
         result = false;
@@ -210,7 +217,7 @@ function jsonTable(dataSource, options){
         var label = $table.attr('label');
         $.tmpl('row', {
             row:defaults.defaultRowHeaderValue,
-            headers: getHeaders(data[label]),
+            headers: getVisibleHeaders($table),
             data: data,
             label: label,
             row_id: $table.find('tr.data-row').length
@@ -236,7 +243,7 @@ function jsonTable(dataSource, options){
             $.tmpl('cell', {
                 data:{},
                 row_id:i,
-                row:$(el).find('th input').val(),
+                row:$(el).find('th input.heading-value').val(),
                 column_id: column_id,
                 column: column,
                 table: label
