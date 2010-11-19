@@ -152,8 +152,17 @@ function jsonTable(dataSource, options){
                 .closest('th')
                     .find('.condition-rule')
                         .each(function(i, form){
-                            rules.push(form2object(form));
+                            var value = form2object(form);
+                            if (value['days'].length){
+                                value['days'] = $.map(value['days'], function(i, el){ return parseInt(el, 10);});
+                            } else {
+                                delete value['days'];
+                            }
+                            if (!$.isEmptyObject(value)) {
+                                rules.push(value);
+                            }
         });
+        // TODO: Remove duplicates.
         return rules;
     }
     
@@ -166,12 +175,18 @@ function jsonTable(dataSource, options){
     
     function getRules(conditionName){
         var rules = [];
+        var jsonRules = [];
+        
         $.each(data, function(row, rowData){
             if (rowData[conditionName] && rowData[conditionName]['rules']) {
                 $.each(rowData[conditionName]['rules'], function(i, rule){
-                    rules.push($.extend({}, defaults.rule, rule));
+                    var newRule = $.extend({}, defaults.rule, rule);
+                    var jsonRule = JSON.stringify(rule);
+                    if ($.inArray(jsonRule, jsonRules)){
+                        rules.push(newRule);
+                        jsonRules.push(jsonRule);                        
+                    }
                 });
-                return;
             }
         });
         return rules;
@@ -286,6 +301,7 @@ function jsonTable(dataSource, options){
         // Remove the current rule from the current condition
         evt.preventDefault();
         $(evt.target).closest('.condition-rule').detach();
+        updateSourceFromData();
     }
     
     function preValidate(){
