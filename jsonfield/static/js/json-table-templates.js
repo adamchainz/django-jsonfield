@@ -1,8 +1,7 @@
 $.template('table',
-    "<table border='1' label='{{= label }}' class='json-data-table'>                     " +
+    "<table border='1' class='json-data-table'>                     " +
     "    <tr class='header-row'>                                                         " +
     "        <th>                                                                        " +
-    "            {{= label }}                                                            " +
     "        </th>                                                                       " +
     "        {{each(i, column) headers.columnHeaders}}                                   " +
     "            {{tmpl({column:column, column_id:i}) 'column-header'}}                  " +
@@ -12,7 +11,7 @@ $.template('table',
     "        </th>                                                                       " +
     "    </tr>                                                                           " +
     "    {{each(i, row) headers.rowHeaders}}                                             " +
-    "        {{tmpl({row:row, headers:headers, data:data, label:label, row_id:i}) 'row'}}" +
+    "        {{tmpl({row:row, headers:headers, data:data, row_id:i}) 'row'}}" +
     "    {{/each}}                                                                       " +
     "    <tr><th><button class='add-row'>Add {{= defaults.rowName }}</button></th></tr>  " +
     "</table>                                                                            "
@@ -30,7 +29,7 @@ $.template('row',
     '        {{tmpl({row:row, row_id:row_id}) "row-header-widget"}}                                        '+
     '    </th>                                                                                             '+
     '    {{each(j, column) headers.columnHeaders}}                                                         '+
-    '        {{tmpl({data:data, row:row, column:column, table:label, row_id:row_id, column_id:j}) "cell"}} '+
+    '        {{tmpl({data:data, row:row, column:column, row_id:row_id, column_id:j}) "cell"}} '+
     '    {{/each}}                                                                                         '+
     '</tr>                                                                                                 '
 );

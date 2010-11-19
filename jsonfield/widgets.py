@@ -19,6 +19,7 @@ class JSONTableWidget(JSONWidget):
         js = (
             settings.STATICFILES_URL + 'js/jquery.min.js',
             settings.STATICFILES_URL + 'js/jquery.tmpl.js',
+            settings.STATICFILES_URL + 'js/form2object.js',
             settings.STATICFILES_URL + 'js/json-table.js',
             settings.STATICFILES_URL + 'js/json-table-templates.js',
         )
