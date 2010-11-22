@@ -182,9 +182,9 @@ function jsonTable(dataSource, options){
                 $.each(rowData[conditionName]['rules'], function(i, rule){
                     var newRule = $.extend({}, defaults.rule, rule);
                     var jsonRule = JSON.stringify(rule);
-                    if ($.inArray(jsonRule, jsonRules)){
+                    if ($.inArray(jsonRule, jsonRules) == -1){
                         rules.push(newRule);
-                        jsonRules.push(jsonRule);                        
+                        jsonRules.push(jsonRule);
                     }
                 });
             }
