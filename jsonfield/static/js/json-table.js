@@ -147,6 +147,7 @@ function jsonTable(dataSource, options){
     
     function getVisibleRules(conditionName) {
         var rules = [];
+        var jsonRules = [];
         $table
             .find('th.column-header input[value="' + conditionName + '"]')
                 .closest('th')
@@ -158,11 +159,13 @@ function jsonTable(dataSource, options){
                             } else {
                                 delete value['days'];
                             }
-                            if (!$.isEmptyObject(value)) {
+                            // Only add rules that haven't already been added, and are not empty.
+                            var jsonRule = JSON.stringify(value);
+                            if (!$.isEmptyObject(value) && $.inArray(jsonRule, jsonRules) == -1) {
+                                jsonRules.push(jsonRule);
                                 rules.push(value);
                             }
         });
-        // TODO: Remove duplicates.
         return rules;
     }
     
