@@ -303,7 +303,9 @@ function jsonTable(dataSource, options){
     function deleteRule(evt) {
         // Remove the current rule from the current condition
         evt.preventDefault();
-        $(evt.target).closest('.condition-rule').detach();
+        $(evt.target).closest('.condition-rule').fadeToggle('slow', function(){
+            $(this).detach();
+        });
         updateSourceFromData();
     }
     
@@ -336,6 +338,10 @@ function jsonTable(dataSource, options){
         });
     }
     
+    function toggleHeaderRuleDisplay(evt) {
+        $(evt.target).closest('th').find('.rule-conditions').slideToggle('fast');
+        $(evt.target).toggleClass('disclosed');
+    }
     // Load the templates for performance reasons.
     // The default templates will have already been loaded 
     // from json-table-templates.js (also part of the media for the widget)
@@ -373,7 +379,9 @@ function jsonTable(dataSource, options){
     $('.delete-rule').live('click', deleteRule);
     $dataSource.live('change blur', updateDataFromSource);
     
-    // $dataSource.hide();
+    $('.toggleHeaderRuleDisplay').live('click', toggleHeaderRuleDisplay);
+    
+    $dataSource.hide();
     
     return $;
 }
