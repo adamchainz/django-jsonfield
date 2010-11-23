@@ -155,7 +155,9 @@ function jsonTable(dataSource, options){
                         .each(function(i, form){
                             var value = form2object(form);
                             if (value['days'].length){
-                                value['days'] = $.map(value['days'], function(i, el){ return parseInt(el, 10);});
+                                value['days'] = $.map(value['days'], function(i, el){
+                                    return parseInt(i, 10);
+                                });
                             } else {
                                 delete value['days'];
                             }
@@ -201,7 +203,6 @@ function jsonTable(dataSource, options){
         $.each(conditionNames, function(i, conditionName){
             conditions[conditionName] = getRules(conditionName);
         });
-        console.log(conditions);
         return conditions;
     }
     
@@ -283,6 +284,7 @@ function jsonTable(dataSource, options){
         $table.find('input.cell-value').filter(function(i){
             return $(this).attr('column_id') == column_id;
         }).attr('column', newName);
+        updateSourceFromData();
     }
     
     function updateRowHeader(evt) {
@@ -292,12 +294,14 @@ function jsonTable(dataSource, options){
         console.log(newValue);
         $th.find(':input:hidden').val(newValue);
         $th.closest('tr').find('input.cell-value').attr('row', newValue);
+        updateSourceFromData();
     }
     
     function addRule(evt) {
         // Add a new rule to the current condition
         evt.preventDefault();
         $.tmpl($('#rule-template'), defaults.rule).insertBefore($(evt.target))  
+        updateSourceFromData();
     }
     
     function deleteRule(evt) {
@@ -381,7 +385,7 @@ function jsonTable(dataSource, options){
     
     $('.toggleHeaderRuleDisplay').live('click', toggleHeaderRuleDisplay);
     
-    $dataSource.hide();
+    // $dataSource.hide();
     
     return $;
 }
