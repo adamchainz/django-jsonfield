@@ -385,7 +385,7 @@ function jsonTable(dataSource, options){
     
     $('.toggleHeaderRuleDisplay').live('click', toggleHeaderRuleDisplay);
     
-    // $dataSource.hide();
+    $dataSource.hide();
     
     return $;
 }
