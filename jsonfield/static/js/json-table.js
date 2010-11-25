@@ -1,8 +1,4 @@
-function DEBUG(msg){
-    console.log(msg);
-}
-
-function jsonTable(dataSource, options){
+var jsonTable = function(dataSource, options){
     // Hang onto the source DOM object.
     var $dataSource = $(dataSource);
     var data = {};
@@ -24,14 +20,18 @@ function jsonTable(dataSource, options){
             days:[],
             start:null, finish:null,
             period:null, length:null
+        },
+        postConstructor: function(){
+            
         }
     };
     
     $.extend(defaults, options);
     
-    // DEBUG(defaults);
     
     function updateDataFromSource(){
+        // Parse whatever data is in the dataSource, and (re)create the
+        // table from that value.
         data = JSON.parse($dataSource.val());
         
         if ($table) {
@@ -47,14 +47,17 @@ function jsonTable(dataSource, options){
     
     
     function getDataFromTable(){
+        // Examine the table, and create the data structure that it
+        // represents.
         var newData = {};
         $table.find('input.cell-value').each(function(i, el){
             $el = $(el);
             var row = $el.attr('row');
             var column = $el.attr('column');
             if (!newData[row]){
-                newData[row] = {}
+                newData[row] = {};
             }
+            // FIXME: This refers to getVisibleRules(), which is rates-table specific.
             if ($el.val()) {
                 newData[row][column] = {rate: $el.val()};
                 if (getVisibleRules(column).length > 0) {
@@ -66,6 +69,7 @@ function jsonTable(dataSource, options){
     }
     
     function stripEmptyData(){
+        // Remove empty cells, rows and columns from the data.
         $.each(data, function(row, rowData){
             $.each(rowData, function(column, value){
                 if (!value){
@@ -79,7 +83,8 @@ function jsonTable(dataSource, options){
     }
     
     function updateSourceFromData(){
-        console.log("Updating source from data.");
+        // Check that the data is valid, and then put that data back
+        // into the dataSource object.
         data = getDataFromTable();
         runValidations();
         
@@ -92,24 +97,18 @@ function jsonTable(dataSource, options){
     }
     
     function runValidations(){
-        // DEBUG("Running validations");
         preValidate();
         findDuplicateHeaders();
         defaults.customValidator(data, errors);
         updateErrors();
-        // DEBUG("Finished running validations (" + errors.length + " errors found)");
-        // if (errors.length) {
-        //     DEBUG(errors);
-        // }
     }
     
     function updateErrors(){
         $table.find('tr, td, th').removeClass('errors');
         $table.parent().find('.errormsg').detach();
-        // DEBUG(errors);
         $.each(errors, function(i,el){
             $($(el).selector).addClass("errors");
-            $($(el).selector).children().first().before('<div style="color:red;" class="errormsg">' + el.reason + "</div>")
+            $($(el).selector).children().first().before('<div style="color:red;" class="errormsg">' + el.reason + "</div>");
         });
         if (errors.length){
             $table.before('<h3 style="color:red;" class="errormsg errors">Errors prevented saving</h3>');
@@ -119,6 +118,7 @@ function jsonTable(dataSource, options){
     function templateData(){
         var result = {
             headers: getHeaderNames(),
+            // FIXME: getConditions() is rates-table-specific
             conditions: getConditions(),
             defaults: defaults,
             data: data
@@ -128,6 +128,7 @@ function jsonTable(dataSource, options){
     }
     
     function getHeaderNames(){
+        // Gets the names of the headers (from the data structure, not the table.)
         var rowHeaders = [], columnHeaders = [];
         $.each(data, function(row, rowData){
             if (!inAny(row, [rowHeaders, defaults.baseRowHeaders])){
@@ -145,6 +146,7 @@ function jsonTable(dataSource, options){
         };
     }
     
+    // FIXME: This needs to move to rates-table.js
     function getVisibleRules(conditionName) {
         var rules = [];
         var jsonRules = [];
@@ -173,11 +175,12 @@ function jsonTable(dataSource, options){
     
     function getVisibleHeaders($table) {
         return {
-            rowHeaders: $table.find('th.row-header input.heading-value').map(function(i,x){return x.value}),
-            columnHeaders: $table.find('th.column-header input.condition-name').map(function(i,x){return x.value})            
+            rowHeaders: $table.find('th.row-header input.heading-value').map(function(i,x){return x.value;}),
+            columnHeaders: $table.find('th.column-header input.heading-value').map(function(i,x){return x.value;})
         };
     }
     
+    // FIXME: Rules are a rate-table.js specific thing.
     function getRules(conditionName){
         var rules = [];
         var jsonRules = [];
@@ -197,6 +200,7 @@ function jsonTable(dataSource, options){
         return rules;
     }
     
+    // FIXME: Conditions are a rates-table.js specific thing
     function getConditions(){
         conditionNames = getHeaderNames()['columnHeaders'];
         conditions = {};
@@ -244,11 +248,7 @@ function jsonTable(dataSource, options){
             data: data,
             row_id: $table.find('tr.data-row').length
         }).insertBefore($(this).closest('tr'));
-        // Disable adding a new row until this one has been edited.
-        // $(this).attr('disabled','disabled');
-        return false;
         runValidations();
-
     }
     
     function addColumn(evt){
@@ -297,21 +297,7 @@ function jsonTable(dataSource, options){
         updateSourceFromData();
     }
     
-    function addRule(evt) {
-        // Add a new rule to the current condition
-        evt.preventDefault();
-        $.tmpl($('#rule-template'), defaults.rule).insertBefore($(evt.target))  
-        updateSourceFromData();
-    }
-    
-    function deleteRule(evt) {
-        // Remove the current rule from the current condition
-        evt.preventDefault();
-        $(evt.target).closest('.condition-rule').fadeToggle('slow', function(){
-            $(this).detach();
-        });
-        updateSourceFromData();
-    }
+
     
     function preValidate(){
         errors = [];
@@ -342,10 +328,7 @@ function jsonTable(dataSource, options){
         });
     }
     
-    function toggleHeaderRuleDisplay(evt) {
-        $(evt.target).closest('th').find('.rule-conditions').slideToggle('fast');
-        $(evt.target).toggleClass('disclosed');
-    }
+
     // Load the templates for performance reasons.
     // The default templates will have already been loaded 
     // from json-table-templates.js (also part of the media for the widget)
@@ -369,7 +352,6 @@ function jsonTable(dataSource, options){
     
     updateDataFromSource();
     
-    // DEBUG('Updated Data');
     /*
     Attach all of the event handlers
     */
@@ -379,13 +361,35 @@ function jsonTable(dataSource, options){
     $('.json-data-table th.row-header :input').live('change blur', updateRowHeader);
     $('.add-row').live('click', addRow);
     $('.add-column').live('click', addColumn);
-    $('.add-rule').live('click', addRule);
-    $('.delete-rule').live('click', deleteRule);
     $dataSource.live('change blur', updateDataFromSource);
     
-    $('.toggleHeaderRuleDisplay').live('click', toggleHeaderRuleDisplay);
-    
     $dataSource.hide();
+    
+    // TODO: Move these bits into another file?
+    function toggleHeaderRuleDisplay(evt) {
+        $(evt.target).closest('th').find('.rule-conditions').slideToggle('fast');
+        $(evt.target).toggleClass('disclosed');
+    }
+    
+    function addRule(evt) {
+        // Add a new rule to the current condition
+        evt.preventDefault();
+        $.tmpl($('#rule-template'), defaults.rule).insertBefore($(evt.target));
+        updateSourceFromData();
+    }
+    
+    function deleteRule(evt) {
+        // Remove the current rule from the current condition
+        evt.preventDefault();
+        $(evt.target).closest('.condition-rule').fadeToggle('slow', function(){
+            $(this).detach();
+        });
+        updateSourceFromData();
+    }
+    
+    $('.add-rule').live('click', addRule);
+    $('.delete-rule').live('click', deleteRule);
+    $('.toggleHeaderRuleDisplay').live('click', toggleHeaderRuleDisplay);
     
     return $;
 }
