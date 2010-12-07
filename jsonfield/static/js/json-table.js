@@ -108,7 +108,17 @@ var jsonTable = function(dataSource, options){
         $table.parent().find('.errormsg').detach();
         $.each(errors, function(i,el){
             $($(el).selector).addClass("errors");
-            $($(el).selector).children().first().before('<div style="color:red;" class="errormsg">' + el.reason + "</div>");
+            $($(el).selector).each(function(){
+                // Make sure this error message isn't already here.
+                if ($(this).find('div.errormsg').filter(function(){
+                    return $(this).html() == el.reason;
+                }).length == 0) {
+                    $(this)
+                        .children()
+                        .first()
+                        .before('<div style="color:red;" class="errormsg">' + el.reason + "</div>")
+                }
+            });
         });
         if (errors.length){
             $table.before('<h3 style="color:red;" class="errormsg errors">Errors prevented saving</h3>');
@@ -152,7 +162,7 @@ var jsonTable = function(dataSource, options){
         var jsonRules = [];
         $table
             .find('th.column-header input')
-                .filter(function(i){return $(this).attr('value') == conditionName})
+                .filter(function(i){return $(this).attr('value') == conditionName;})
                     .closest('th')
                         .find('.condition-rule')
                             .each(function(i, form){
@@ -305,7 +315,11 @@ var jsonTable = function(dataSource, options){
         // Ensure that there are no duplicated row or column headings.
         $table.find('.condition-name').each(function(j, col){
             $this = $(col);
-            selector = $table.find('.condition-name[value="' + $this.val() + '"]').not($this).closest('th');
+            selector = $table
+                .find('.condition-name')
+                .filter(function(i){ return $(this).attr('value') == $this.val(); })
+                .not($this)
+                .closest('th');
             if (selector.length){
                 errors.push({
                     selector:selector,
@@ -316,7 +330,9 @@ var jsonTable = function(dataSource, options){
         
         $table.find('th.row-header').each(function(j,row){
             $this = $(row).find('input:hidden');
-            selector = $table.find('th.row-header input:hidden[value="'+ $this.val() + '"]').not($this).closest('th');
+            selector = $table.find('th.row-header input:hidden').filter(function(i){
+                return $(this).attr('value') == $this.val();
+            }).not($this).closest('th');
             if (selector.length){
                 errors.push({
                     selector:selector,
@@ -390,6 +406,4 @@ var jsonTable = function(dataSource, options){
     $('.toggleHeaderRuleDisplay').live('click', toggleHeaderRuleDisplay);
     
     return $;
-}
-
-
+};
