@@ -92,7 +92,7 @@ var jsonTable = function(dataSource, options){
             stripEmptyData();
         }
         if (!errors.length){
-            $dataSource.val(JSON.stringify(data, null, defaults.jsonIndent));
+            $dataSource.html(JSON.stringify(data, null, defaults.jsonIndent));
         }
     }
     
@@ -151,24 +151,25 @@ var jsonTable = function(dataSource, options){
         var rules = [];
         var jsonRules = [];
         $table
-            .find('th.column-header input[value="' + conditionName + '"]')
-                .closest('th')
-                    .find('.condition-rule')
-                        .each(function(i, form){
-                            var value = form2object(form);
-                            if (value['days'].length){
-                                value['days'] = $.map(value['days'], function(i, el){
-                                    return parseInt(i, 10);
-                                });
-                            } else {
-                                delete value['days'];
-                            }
-                            // Only add rules that haven't already been added, and are not empty.
-                            var jsonRule = JSON.stringify(value);
-                            if (!$.isEmptyObject(value) && $.inArray(jsonRule, jsonRules) == -1) {
-                                jsonRules.push(jsonRule);
-                                rules.push(value);
-                            }
+            .find('th.column-header input')
+                .filter(function(i){return $(this).attr('value') == conditionName})
+                    .closest('th')
+                        .find('.condition-rule')
+                            .each(function(i, form){
+                                var value = form2object(form);
+                                if (value['days'].length){
+                                    value['days'] = $.map(value['days'], function(i, el){
+                                        return parseInt(i, 10);
+                                    });
+                                } else {
+                                    delete value['days'];
+                                }
+                                // Only add rules that haven't already been added, and are not empty.
+                                var jsonRule = JSON.stringify(value);
+                                if (!$.isEmptyObject(value) && $.inArray(jsonRule, jsonRules) == -1) {
+                                    jsonRules.push(jsonRule);
+                                    rules.push(value);
+                                }
         });
         return rules;
     }
@@ -255,9 +256,7 @@ var jsonTable = function(dataSource, options){
         evt.preventDefault();
         // Add a new column header.
         var column = defaults.defaultColumnHeaderValue;
-        console.log(column);
         var column_id = $table.find('tr.header-row th.column-header').length;
-        console.log(column_id);
         $.tmpl('column-header', {
             column: column,
             column_id: column_id,
@@ -291,7 +290,6 @@ var jsonTable = function(dataSource, options){
         evt.preventDefault();
         var $th = $(evt.target).closest('th');
         var newValue = combineFields($th.find(':input.fragment'), ',');
-        console.log(newValue);
         $th.find(':input:hidden').val(newValue);
         $th.closest('tr').find('input.cell-value').attr('row', newValue);
         updateSourceFromData();
@@ -383,8 +381,8 @@ var jsonTable = function(dataSource, options){
         evt.preventDefault();
         $(evt.target).closest('.condition-rule').fadeToggle('slow', function(){
             $(this).detach();
+            updateSourceFromData();
         });
-        updateSourceFromData();
     }
     
     $('.add-rule').live('click', addRule);
