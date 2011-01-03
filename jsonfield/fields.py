@@ -24,7 +24,10 @@ class JSONField(models.TextField):
 
     def to_python(self, value):
         if isinstance(value, basestring):
-            value = json.loads(value)
+            if value == '':
+                return None
+            else:
+                value = json.loads(value)
         return value
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
