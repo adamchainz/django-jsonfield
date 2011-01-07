@@ -7,13 +7,13 @@ $.template('table',
     "            {{tmpl({column:column, column_id:i}) 'column-header'}}                  " +
     "        {{/each}}                                                                   " +
     "        <th class='add-column'>                                                     " +
-    "            <button>Add {{= defaults.columnName }}</button>                         " +
+    "            <button>Add {{= settings.columnName }}</button>                         " +
     "        </th>                                                                       " +
     "    </tr>                                                                           " +
     "    {{each(i, row) headers.rowHeaders}}                                             " +
     "        {{tmpl({row:row, headers:headers, data:data, row_id:i}) 'row'}}" +
     "    {{/each}}                                                                       " +
-    "    <tr><th><button class='add-row'>Add {{= defaults.rowName }}</button></th></tr>  " +
+    "    <tr><th><button class='add-row'>Add {{= settings.rowName }}</button></th></tr>  " +
     "</table>                                                                            "
 );
 
@@ -42,12 +42,17 @@ $.template('column-header-widget',
     '<input type="text" value="{{= column }}" column_id="{{= column_id }}" class="heading-value">'
 );
 
-$.template('cell',
-    '<td>                                                                                       '+
-    '<input                                                                                     '+
-    '    type="text" value="{{if data[row]}}{{= data[row][column] }}{{/if}}" class="cell-value" '+
-    '    row="{{= row }}" column="{{= column }}" table="{{= table }}"                           '+
-    '    row_id="{{= row_id }}" column_id="{{= column_id }}"                                    '+
-    '>                                                                                          '+
-    '</td>                                                                                      '
+// $.template('cell',
+//     '<td class="cell" row="{{= row }}" column="{{= column }}" row_id="{{= row_id }}" column_id="{{= column_id }}">'+
+//     '{{each ["rate", "payroll_categories"]}}' +
+//     '    {{tmpl(name:$value, type:"text", data:data, row:row, column:column) "cell-input"}}'+
+//     '{{/each}}'+
+//     '</td>                                                                                      '
+// );
+
+$.template('cell-input',
+    '<input type="{{= type }}"                                                                  ' +
+    '    cell-name="{{= name }}"                                                                ' +
+    '    value="{{if data[row] && data[row][column] }}{{= data[row][column][name]}}{{/if}}"     ' +
+    '>                                                                                          '
 );
