@@ -1,4 +1,5 @@
 var jsonTable = function(dataSource, options){
+
     // Hang onto the source DOM object.
     var $dataSource = $(dataSource);
     var data = {};
@@ -16,18 +17,22 @@ var jsonTable = function(dataSource, options){
         defaultColumnHeaderValue: "",
         display: "inline",
         stripEmptyData: true,
-        rule: {
-            days:[],
-            start:null, finish:null,
-            period:null, length:null
+        columnAttributes: {
+            rules: {
+                days:[],
+                start:null, finish:null,
+                period:null, length:null
+            }
         },
+        rowAttributes: {}, // Needed?
         postConstructor: function(){
             
-        }
+        },
+        eventHandlers: []
+        
     };
     
     $.extend(defaults, options);
-    
     
     function updateDataFromSource(){
         // Parse whatever data is in the dataSource, and (re)create the
@@ -50,19 +55,23 @@ var jsonTable = function(dataSource, options){
         // Examine the table, and create the data structure that it
         // represents.
         var newData = {};
-        $table.find('input.cell-value').each(function(i, el){
+        $table.find('td.cell').each(function(i, el){
             $el = $(el);
             var row = $el.attr('row');
             var column = $el.attr('column');
             if (!newData[row]){
                 newData[row] = {};
             }
-            // FIXME: This refers to getVisibleRules(), which is rates-table specific.
-            if ($el.val()) {
-                newData[row][column] = {rate: $el.val()};
-                if (getVisibleRules(column).length > 0) {
-                    newData[row][column]['rules'] = getVisibleRules(column);
+            newData[row][column] = {};
+            $el.find('input').each(function(i, inner){
+                $inner = $(inner);
+                if ($inner.val()){
+                    newData[row][column][$inner.attr('cell-name')] = $inner.val();
                 }
+            });
+            if (newData[row][column]) {
+                $.extend(newData[row][column], getExtraColumnAttributes(column));
+                $.extend(newData[row][column], getExtraRowAttributes(row));
             }
         });
         return newData;
@@ -104,6 +113,7 @@ var jsonTable = function(dataSource, options){
     }
     
     function updateErrors(){
+        // TODO: Use templates from html file.
         $table.find('tr, td, th').removeClass('errors');
         $table.parent().find('.errormsg').detach();
         $.each(errors, function(i,el){
@@ -125,14 +135,48 @@ var jsonTable = function(dataSource, options){
         }
     }
     
+    function getColumnAttributes() {
+        var attributes = {};
+        $.each(data, function(i, row){
+            $.each(row, function(name, column){
+                if (!attributes[name]){
+                    attributes[name] = {};
+                }
+                $.each(defaults.columnAttributes, function(attr, value){
+                    attributes[name][attr] = value;
+                });
+            });
+        });
+        return attributes;
+    }
+    
+    function getRowAttributes(){
+        var attributes = {};
+        $.each(data, function(i, row){
+            if (!attributes[row]) {
+                attributes[row] = {};
+            }
+            $.each(row, function(j, column){
+                $.each(defaults.columnAttributes, function(attr, value){
+                    attributes[row][attr] = value;
+                });
+            });
+        });
+        return attributes;
+    }
+    
     function templateData(){
         var result = {
             headers: getHeaderNames(),
             // FIXME: getConditions() is rates-table-specific
-            conditions: getConditions(),
+            // conditions: getConditions(),
+            column_attributes: getColumnAttributes(),
+            row_attributes: getRowAttributes(),
             defaults: defaults,
             data: data
         };
+        
+        // console.log(result);
         
         return result;
     }
@@ -156,32 +200,56 @@ var jsonTable = function(dataSource, options){
         };
     }
     
-    // FIXME: This needs to move to rates-table.js
-    function getVisibleRules(conditionName) {
-        var rules = [];
-        var jsonRules = [];
-        $table
-            .find('th.column-header input')
-                .filter(function(i){return $(this).attr('value') == conditionName;})
-                    .closest('th')
-                        .find('.condition-rule')
-                            .each(function(i, form){
-                                var value = form2object(form);
-                                if (value['days'].length){
-                                    value['days'] = $.map(value['days'], function(i, el){
-                                        return parseInt(i, 10);
-                                    });
-                                } else {
-                                    delete value['days'];
-                                }
-                                // Only add rules that haven't already been added, and are not empty.
-                                var jsonRule = JSON.stringify(value);
-                                if (!$.isEmptyObject(value) && $.inArray(jsonRule, jsonRules) == -1) {
-                                    jsonRules.push(jsonRule);
-                                    rules.push(value);
-                                }
+    function getExtraColumnAttributes(columnName) {
+        var extras = {};
+        $table.find('th.column-header input')
+            .filter(function(i){ return $(this).attr('value') == columnName; })
+                .closest('th').find('.column-attribute')
+                    .each(function(i, form){
+                        // Get the name of this attribute.
+                        var attr = $(form).attr('attr-name');
+                        // console.log(attr);
+                        if (!extras[attr]){
+                            // If we have not seen this attribute before, add it into the possible extras/jsonExtras
+                            extras[attr] = [];
+                        }
+                        // Convert the fields within it to a JSON object.
+                        var value = form2object(form);
+                        // console.log(form);
+                        // console.log(value);
+                        // If we have any select[multiple] elements, that contain a map attribute,
+                        // use that attribute as the name of a function to use
+                        $(form).find('select').filter(function(i, field){
+                            return $(field).attr('multiple') && $(field).attr('map');
+                        }).each(function(j, field){
+                            var $field = $(field);
+                            var name = $field.attr('name');
+                            if (value[name].length) {
+                                value[name] = $.map(value[name], function(i, el){
+                                    return eval($(field).attr('map') + '(' + i + ')');
+                                });                                
+                            } else {
+                                delete value[name];
+                            }
+                        });
+                        if (!$.isEmptyObject(value)){
+                            extras[attr].push(value);                            
+                        }
+                    });
+        $.each(extras, function(key, value){
+            if (value.length == 0){
+                delete extras[key];
+            }
         });
-        return rules;
+        // console.log(extras);
+        return extras;    
+    }
+    
+    function getExtraRowAttributes(rowName) {
+        var extras = {};
+        var jsonExtras = {};
+        
+        return extras;
     }
     
     function getVisibleHeaders($table) {
@@ -191,34 +259,21 @@ var jsonTable = function(dataSource, options){
         };
     }
     
-    // FIXME: Rules are a rate-table.js specific thing.
-    function getRules(conditionName){
-        var rules = [];
-        var jsonRules = [];
-        
-        $.each(data, function(row, rowData){
-            if (rowData[conditionName] && rowData[conditionName]['rules']) {
-                $.each(rowData[conditionName]['rules'], function(i, rule){
-                    var newRule = $.extend({}, defaults.rule, rule);
-                    var jsonRule = JSON.stringify(rule);
-                    if ($.inArray(jsonRule, jsonRules) == -1){
-                        rules.push(newRule);
-                        jsonRules.push(jsonRule);
-                    }
-                });
-            }
+    function getRowOrColumns(which){
+        var names = getHeaderNames()[which.toLowerCase() + 'Headers'];
+        var response = {};
+        $.each(names, function(i, name){
+            response[name] = eval('getExtra' + which + 'Attributes')(which);
         });
-        return rules;
+        return response;
     }
     
-    // FIXME: Conditions are a rates-table.js specific thing
-    function getConditions(){
-        conditionNames = getHeaderNames()['columnHeaders'];
-        conditions = {};
-        $.each(conditionNames, function(i, conditionName){
-            conditions[conditionName] = getRules(conditionName);
-        });
-        return conditions;
+    function getColumns(){
+        return getRowOrColumns('Column');
+    }
+    
+    function getRows(){
+        return getRowOrColumns('Row');
     }
     
     function inAny(value, arrays){
@@ -377,33 +432,13 @@ var jsonTable = function(dataSource, options){
     $('.add-column').live('click', addColumn);
     $dataSource.live('change blur', updateDataFromSource);
     
-    $dataSource.hide();
+    // $dataSource.hide();
+    }()
+    $.each(defaults.eventHandlers, function(i, handler){
+        $(handler.selector).live(handler.event, handler.handler());
+    });
     
-    // TODO: Move these bits into another file?
-    function toggleHeaderRuleDisplay(evt) {
-        $(evt.target).closest('th').find('.rule-conditions').slideToggle('fast');
-        $(evt.target).toggleClass('disclosed');
-    }
-    
-    function addRule(evt) {
-        // Add a new rule to the current condition
-        evt.preventDefault();
-        $.tmpl($('#rule-template'), defaults.rule).insertBefore($(evt.target));
-        updateSourceFromData();
-    }
-    
-    function deleteRule(evt) {
-        // Remove the current rule from the current condition
-        evt.preventDefault();
-        $(evt.target).closest('.condition-rule').fadeToggle('slow', function(){
-            $(this).detach();
-            updateSourceFromData();
-        });
-    }
-    
-    $('.add-rule').live('click', addRule);
-    $('.delete-rule').live('click', deleteRule);
-    $('.toggleHeaderRuleDisplay').live('click', toggleHeaderRuleDisplay);
+    console.log(arguments.callee.updateSourceFromData);
     
     return $;
 };
