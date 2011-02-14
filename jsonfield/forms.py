@@ -17,7 +17,7 @@ class JSONFormField(forms.CharField):
         we will assume that is where it has come from.
         """
         if not value: 
-            return
+            return value
         if isinstance(value, basestring):
             try:
                 return json.loads(value)
