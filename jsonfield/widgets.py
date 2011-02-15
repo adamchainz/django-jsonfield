@@ -16,7 +16,7 @@ class JSONSelectWidget(forms.SelectMultiple):
 
 class JSONTableWidget(JSONWidget):
     class Media:
-        if hasattr(settings, 'STATIC_URL'):
+        if hasattr(settings, 'STATIC_URL') and settings.STATIC_URL:
             js = (
                 settings.STATIC_URL + 'js/jquery-1.4.4.js',
                 settings.STATIC_URL + 'js/jquery.tmpl.js',
