@@ -16,6 +16,7 @@ class JSONSelectWidget(forms.SelectMultiple):
 
 class JSONTableWidget(JSONWidget):
     class Media:
+        # TODO: move these into our subdirectory, and use shared versions of jquery/tmpl.
         if hasattr(settings, 'STATIC_URL') and settings.STATIC_URL:
             js = (
                 settings.STATIC_URL + 'js/jquery-1.4.4.js',
