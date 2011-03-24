@@ -2,12 +2,20 @@ from django.db import models
 from django import forms
 from django.utils import simplejson as json
 from decimal import Decimal
+import datetime
 
 from forms import JSONFormField
 
 def default(o):
     if isinstance(o, Decimal):
         return str(o)
+    if isinstance(o, datetime.datetime):
+        return o.strftime("%Y-%m-%dT%H:%M:%S")
+    if isinstance(o, datetime.date):
+        return o.strftime("%Y-%m-%d")
+    if isinstance(o, datetime.time):
+        return o.strftime("%H:%M:%S")
+        
     raise TypeError(repr(o) + " is not JSON serializable")
 
 
