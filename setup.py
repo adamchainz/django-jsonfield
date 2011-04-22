@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name = "django-jsonfield",
@@ -16,4 +16,5 @@ setup(
         'Operating System :: OS Independent',
         'Framework :: Django',
     ],
+    test_suite='tests.main',
 )

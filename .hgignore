@@ -1,3 +1,17 @@
+syntax: glob
+*.orig
+*.rej
+*~
+*.bak
+*.marks
+*.o
+*.pyc
+*.swp
 .bookmarks
+django_jsonfield.egg-info
 MANIFEST
+build
 dist
+
+syntax: regexp
+.*\#.*\#$ 

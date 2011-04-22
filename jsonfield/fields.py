@@ -32,25 +32,20 @@ class JSONField(models.TextField):
 
     def to_python(self, value):
         if isinstance(value, basestring):
-            value = json.loads(value)
+            if value == '':
+                return None
+            else:
+                value = json.loads(value)
         return value
 
-    def get_db_prep_save(self, value, connection):
+    def get_db_prep_value(self, value, connection=None, prepared=None):
         if value is None: 
             return None
         return json.dumps(value, default=default)
-    
-    def get_db_prep_value(self, value, connection, prepared=None):
-        return self.get_db_prep_save(value, connection=connection)
 
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
-        # Currently just returning the actual value, since otherwise I
-        # get a string when I serialize this object, when I really want a
-        # data structure.
-        # return self.get_db_prep_value(value)
-        return value
-
+        return self.get_db_prep_value(value)
 
 try:
     from south.modelsinspector import add_introspection_rules
