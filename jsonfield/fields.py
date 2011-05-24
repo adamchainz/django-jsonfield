@@ -32,6 +32,8 @@ class JSONField(models.TextField):
 
     def to_python(self, value):
         if isinstance(value, basestring):
+            if value == "":
+                return None
             value = json.loads(value)
         return value
 
