@@ -37,14 +37,11 @@ class JSONField(models.TextField):
             value = json.loads(value)
         return value
 
-    def get_db_prep_save(self, value, connection):
+    def get_prep_value(self, value):
         if value is None: 
             return None
         return json.dumps(value, default=default)
     
-    def get_db_prep_value(self, value, connection, prepared=None):
-        return self.get_db_prep_save(value, connection=connection)
-
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         # Currently just returning the actual value, since otherwise I
