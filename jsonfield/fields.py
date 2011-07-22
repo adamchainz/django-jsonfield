@@ -35,6 +35,7 @@ class JSONField(models.TextField):
             if value == "":
                 return None
             value = json.loads(value)
+        # TODO: Look for date/time/datetime objects within the structure?
         return value
 
     def get_prep_value(self, value):
