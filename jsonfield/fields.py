@@ -15,7 +15,7 @@ def default(o):
         return o.strftime("%Y-%m-%d")
     if isinstance(o, datetime.time):
         return o.strftime("%H:%M:%S")
-        
+
     raise TypeError(repr(o) + " is not JSON serializable")
 
 
@@ -24,9 +24,9 @@ class JSONField(models.TextField):
     A field that will ensure the data entered into it is valid JSON.
     """
     __metaclass__ = models.SubfieldBase
-    
+
     description = "JSON object"
-    
+
     def formfield(self, **kwargs):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
 
@@ -38,11 +38,11 @@ class JSONField(models.TextField):
         # TODO: Look for date/time/datetime objects within the structure?
         return value
 
-    def get_prep_value(self, value):
-        if value is None: 
+    def get_db_prep_save(self, value, connection = None):
+        if value is None:
             return None
         return json.dumps(value, default=default)
-    
+
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         # Currently just returning the actual value, since otherwise I
