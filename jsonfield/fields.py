@@ -15,7 +15,7 @@ def default(o):
         return o.strftime("%Y-%m-%d")
     if isinstance(o, datetime.time):
         return o.strftime("%H:%M:%S")
-        
+
     raise TypeError(repr(o) + " is not JSON serializable")
 
 
@@ -24,11 +24,18 @@ class JSONField(models.TextField):
     A field that will ensure the data entered into it is valid JSON.
     """
     __metaclass__ = models.SubfieldBase
-    
+
     description = "JSON object"
-    
+
     def formfield(self, **kwargs):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
+
+    def get_default(self):
+        if self.has_default():
+            if callable(self.default):
+                return self.default()
+            return self.default
+        return super(JSONField, self).get_default()
 
     def to_python(self, value):
         if isinstance(value, basestring):
@@ -39,7 +46,7 @@ class JSONField(models.TextField):
         return value
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
-        if value is None: 
+        if value is None:
             return None
         return json.dumps(value, default=default)
 
