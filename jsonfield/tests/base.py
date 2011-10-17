@@ -39,7 +39,7 @@ class JSONFieldTest(DjangoTestCase):
         field = JSONField(u"test")
         field.set_attributes_from_name("json")
         self.assertEquals(None, field.get_db_prep_value(None))
-        self.assertEquals('{"spam": "eggs"}', field.get_db_prep_value({"spam": "eggs"}))
+        self.assertEquals('{"spam":"eggs"}', field.get_db_prep_value({"spam": "eggs"}))
 
     def test_value_to_string(self):
         field = JSONField(u"test")
@@ -47,7 +47,7 @@ class JSONFieldTest(DjangoTestCase):
         obj = JSONFieldTestModel(json='''{
             "spam": "eggs"
         }''')
-        self.assertEquals(u'{"spam": "eggs"}', field.value_to_string(obj))
+        self.assertEquals(u'{"spam":"eggs"}', field.value_to_string(obj))
 
     def test_formfield(self):
         from jsonfield.forms import JSONFormField
