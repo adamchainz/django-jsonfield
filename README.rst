@@ -29,4 +29,4 @@ TZNAME). This is actually a bit tricky, as we don't know if we are expecting
 a date/time object. We may parse objects as we go, but there could be
 some performance issues with this.
 
-.. _David Cramer's blog: http://www.davidcramer.net/code/448/cleaning-up-with-json-and-sql.html
+.. _David Cramer's blog: http://justcramer.com/2009/04/14/cleaning-up-with-json-and-sql/
