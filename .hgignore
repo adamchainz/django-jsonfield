@@ -1,3 +1,6 @@
+syntax:glob
 .bookmarks
 MANIFEST
 dist
+django_jsonfield.egg-info
+*.pyc
