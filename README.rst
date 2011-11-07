@@ -28,7 +28,7 @@ There are also a couple of other bits and bobs:
     {% load jsonify %}
     
     <script>
-        var foo = {{ bar|jsonify }};
+    var foo = {{ bar|jsonify }};
     </script>
   
 - JSONTableWidget
