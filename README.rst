@@ -30,7 +30,7 @@ There are also a couple of other bits and bobs:
     <script>
         var foo = {{ bar|jsonify }};
     </script>
-    
+  
 - JSONTableWidget
   I strongly recommend you don't use this: it's an experimental way of having
   a generic JSON structure represented as a table, enabling you to let non-programmer
