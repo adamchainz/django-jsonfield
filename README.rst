@@ -20,6 +20,24 @@ Now, it will validate the JSON on entry, and store it as a string in the
 database.  When you instantiate/fetch the object, it will be turned back
 into a python list/dict/string.
 
+There are also a couple of other bits and bobs:
+
+- jsonify templatetag:
+  This allows you to convert a python data structure into JSON within a template.
+
+    {% load jsonify %}
+    
+    <script>
+        var foo = {{ bar|jsonify }};
+    </script>
+    
+- JSONTableWidget
+  I strongly recommend you don't use this: it's an experimental way of having
+  a generic JSON structure represented as a table, enabling you to let non-programmer
+  types edit JSON data.
+  I have replaced a lot of the code that is here with some new KnockoutJS-based
+  stuff, and that simplifies it a whole lot. As such, I am not using this widget
+  any longer, and it may not work.
 
 Todo
 ----------
