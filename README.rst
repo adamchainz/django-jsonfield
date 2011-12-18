@@ -39,6 +39,11 @@ There are also a couple of other bits and bobs:
   stuff, and that simplifies it a whole lot. As such, I am not using this widget
   any longer, and it may not work.
 
+History
+----------
+* 0.7 : First time I tagged releases.
+
+
 Todo
 ----------
 
