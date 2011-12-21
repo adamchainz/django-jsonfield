@@ -1,3 +1,7 @@
-__version__ = "0.7"
+__version__ = "0.7.1"
 
-from fields import JSONField
+# Temporary fix to not fail when django is not yet installed.
+try:
+    from fields import JSONField
+except ImportError:
+    pass
