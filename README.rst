@@ -41,6 +41,7 @@ There are also a couple of other bits and bobs:
 
 History
 ----------
+* 0.7.1 : Don't fail when trying to install before django is installed.
 * 0.7 : First time I tagged releases.
 
 
