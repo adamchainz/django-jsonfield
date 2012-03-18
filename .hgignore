@@ -7,8 +7,8 @@ syntax: glob
 *.o
 *.pyc
 *.swp
+*.egg-info
 .bookmarks
-django_jsonfield.egg-info
 MANIFEST
 build
 dist

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "django-jsonfield",
-    version = "0.6",
+    version = '0.6',
     description = "JSONField for django models",
     url = "http://bitbucket.org/schinckel/django-jsonfield/",
     author = "Matthew Schinckel",

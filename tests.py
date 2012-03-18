@@ -21,8 +21,17 @@ def main():
         'jsonfield',
         'jsonfield.tests.jsonfield_test_app',
     )
+    global_settings.DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+    # Django 1.1 compat
     global_settings.DATABASE_ENGINE = "sqlite3"
     global_settings.DATABASE_NAME = ":memory:"
+ 
+
     global_settings.STATIC_URL = "/static/"
     global_settings.MEDIA_ROOT = os.path.join(BASE_PATH, 'static')
     global_settings.STATIC_ROOT = global_settings.MEDIA_ROOT
