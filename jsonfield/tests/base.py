@@ -1,12 +1,11 @@
 #:coding=utf-8:
 
 from django.test import TestCase as DjangoTestCase
-from django.core.exceptions import ValidationError
-from django.db import connection
-from django.db import models
 
-from jsonfield.tests.jsonfield_test_app.models import JSONFieldTestModel, \
-                                                      JSONFieldWithDefaultTestModel
+from jsonfield.tests.jsonfield_test_app.models import (
+    JSONFieldTestModel,
+    JSONFieldWithDefaultTestModel
+)
 from jsonfield import JSONField
 
 class JSONFieldTest(DjangoTestCase):
@@ -21,7 +20,7 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(obj.json, None)
 
     def test_json_field_save(self):
-        obj = JSONFieldTestModel.objects.create(
+        JSONFieldTestModel.objects.create(
             id=10,
             json='''{
                 "spam": "eggs"
@@ -31,7 +30,7 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(obj2.json, {'spam':'eggs'})
 
     def test_json_field_save_empty(self):
-        obj = JSONFieldTestModel.objects.create(id=10, json='')
+        JSONFieldTestModel.objects.create(id=10, json='')
         obj2 = JSONFieldTestModel.objects.get(id=10)
         self.assertEquals(obj2.json, None)
 
