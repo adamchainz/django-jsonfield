@@ -19,7 +19,6 @@ def main():
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'jsonfield',
-        'jsonfield.tests.jsonfield_test_app',
     )
     global_settings.DATABASES = {
         'default': {
