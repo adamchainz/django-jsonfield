@@ -31,16 +31,13 @@ There are also a couple of other bits and bobs:
     var foo = {{ bar|jsonify }};
     </script>
   
-- JSONTableWidget
-  I strongly recommend you don't use this: it's an experimental way of having
-  a generic JSON structure represented as a table, enabling you to let non-programmer
-  types edit JSON data.
-  I have replaced a lot of the code that is here with some new KnockoutJS-based
-  stuff, and that simplifies it a whole lot. As such, I am not using this widget
-  any longer, and it may not work.
-
 History
 ----------
+* 0.8 : Supports django 1.2
+        Supports callable and json serializable objects as default
+        Implemented get_db_prep_value()
+        Add tests and test runner.
+        Removed JSONTableWidget from README.
 * 0.7.1 : Don't fail when trying to install before django is installed.
 * 0.7 : First time I tagged releases.
 
