@@ -44,14 +44,16 @@ class JSONField(models.TextField):
         # TODO: Look for date/time/datetime objects within the structure?
         return value
 
-    def get_db_prep_value(self, value, connection=None, prepared=None):
+    def get_db_prep_save(self, value, connection=None, prepared=None):
         if value is None:
             return None
-        return json.dumps(value, default=default, separators=(',', ':'))
+        return json.dumps(value, default=default)
+    
+    def get_prep_lookup(self, lookup_type, value):
+        return json.dumps(value, default=default)
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
-        return self.get_db_prep_value(value)
+        return self._get_val_from_obj(obj)
 
 try:
     from south.modelsinspector import add_introspection_rules

@@ -33,6 +33,10 @@ There are also a couple of other bits and bobs:
   
 History
 ----------
+* 0.8.1 : Removed get_db_prep_value, as querying from a JSON object fails.
+          Converting to string does nothing, as serializing a model instance
+          with a JSONField would have a string version of that field, instead
+          of it embedded inline.
 * 0.8 : Supports django 1.2
         Supports callable and json serializable objects as default
         Implemented get_db_prep_value()
@@ -44,6 +48,12 @@ History
 
 Todo
 ----------
+
+Allow for more complex querying:
+
+    Model.objects.filter(json__contains={"foo":"bar"})
+    
+    => Matches anything that has a foo key with a value of bar.
 
 Convert date/time objects nicely to/from ISO strings (YYYY-mm-dd HH:MM:SS 
 TZNAME). This is actually a bit tricky, as we don't know if we are expecting

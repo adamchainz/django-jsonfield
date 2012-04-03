@@ -10,3 +10,4 @@ class JSONFieldWithDefaultTestModel(models.Model):
     json = JSONField(default={"sukasuka": "YAAAAAZ"})
     class Meta:
         app_label = 'jsonfield'
+
