@@ -1,5 +1,8 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import simplejson as json
+from django.utils.translation import ugettext as _
+
 from decimal import Decimal
 import datetime
 
@@ -23,11 +26,21 @@ class JSONField(models.TextField):
     A field that will ensure the data entered into it is valid JSON.
     """
     __metaclass__ = models.SubfieldBase
-
+    default_error_messages = {
+        'invalid': _(u"Enter a valid JSON string.")
+    }
     description = "JSON object"
 
     def formfield(self, **kwargs):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
+    
+    def validate(self, value):
+        if self.required and not value:
+            raise ValidationError(self.error_messages['required'])
+        try:
+            self.get_db_prep_value(value)
+        except:
+            raise ValidationError(self.error_messages['invalid'])
 
     def get_default(self):
         if self.has_default():
@@ -44,13 +57,24 @@ class JSONField(models.TextField):
         # TODO: Look for date/time/datetime objects within the structure?
         return value
 
-    def get_db_prep_save(self, value, connection=None, prepared=None):
+    def get_db_prep_value(self, value, connection=None, prepared=None):
         if value is None:
             return None
         return json.dumps(value, default=default)
     
     def get_prep_lookup(self, lookup_type, value):
-        return json.dumps(value, default=default)
+        if lookup_type in ["exact", "iexact"]:
+            return self.to_python(self.get_db_prep_value(value))
+        if lookup_type == "in":
+            return [self.to_python(self.get_db_prep_value(v)) for v in value]
+        if lookup_type in ["contains", "icontains"]:
+            if isinstance(value, (list, tuple)):
+                # Need a way co combine the values with '%', but don't escape that.
+                return self.get_db_prep_value(value)[1:-1].replace(', ', r'%')
+            if isinstance(value, dict):
+                return self.get_db_prep_value(value)[1:-1]
+            return self.to_python(self.get_db_prep_value(value))
+        raise TypeError('Lookup type %r not supported' % lookup_type)
 
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj)

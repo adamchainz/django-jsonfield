@@ -65,9 +65,17 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(obj.json, {'sukasuka': 'YAAAAAZ'})
 
     def test_query_object(self):
-        obj = JSONFieldTestModel.objects.create(json={})
-        obj = JSONFieldTestModel.objects.create(json={'foo':'bar'})
+        JSONFieldTestModel.objects.create(json={})
+        JSONFieldTestModel.objects.create(json={'foo':'bar'})
         self.assertEquals(2, JSONFieldTestModel.objects.all().count())
         self.assertEquals(1, JSONFieldTestModel.objects.exclude(json={}).count())
         self.assertEquals(1, JSONFieldTestModel.objects.filter(json={}).count())
         self.assertEquals(1, JSONFieldTestModel.objects.filter(json={'foo':'bar'}).count())
+        self.assertEquals(1, JSONFieldTestModel.objects.filter(json__contains={'foo':'bar'}).count())
+        JSONFieldTestModel.objects.create(json={'foo':'bar', 'baz':'bing'})
+        self.assertEquals(2, JSONFieldTestModel.objects.filter(json__contains={'foo':'bar'}).count())
+        self.assertEquals(1, JSONFieldTestModel.objects.filter(json__contains={'baz':'bing', 'foo':'bar'}).count())
+        self.assertEquals(2, JSONFieldTestModel.objects.filter(json__contains='foo').count())
+        self.assertEquals(1, JSONFieldTestModel.objects.filter(json__contains=['baz', 'foo']).count())
+        
+        
