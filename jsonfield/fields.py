@@ -71,6 +71,9 @@ class JSONField(models.TextField):
             return value
         if lookup_type in ["contains", "icontains"]:
             if isinstance(value, (list, tuple)):
+                raise TypeError("Lookup type %r not supported with argument of %s" % (
+                    lookup_type, type(value).__name__
+                ))
                 # Need a way co combine the values with '%', but don't escape that.
                 return self.get_db_prep_value(value)[1:-1].replace(', ', r'%')
             if isinstance(value, dict):
