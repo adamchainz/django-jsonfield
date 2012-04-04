@@ -7,8 +7,10 @@ with ``pip install -e``.
 
 So I took the code from `David Cramer's blog`_, and packaged it up.
 
-To use, just install the package, and then use the field::
+Usage
+-----
 
+To use, just install the package, and then use the field::
 
     from django.db import models
     import jsonfield
@@ -22,8 +24,12 @@ into a python list/dict/string.
 
 There are also a couple of other bits and bobs:
 
-- jsonify templatetag:
-  This allows you to convert a python data structure into JSON within a template.
+Extras
+------
+
+jsonify templatetag
+~~~~~~~~~~~~~~~~~~~
+This allows you to convert a python data structure into JSON within a template::
 
     {% load jsonify %}
     
@@ -33,31 +39,44 @@ There are also a couple of other bits and bobs:
   
 History
 ----------
-* 0.8.1 : Removed get_db_prep_value, as querying from a JSON object fails.
-          Converting to string does nothing, as serializing a model instance
-          with a JSONField would have a string version of that field, instead
-          of it embedded inline. 
-           
-          Added better querying support (``field__contains={'key':'value','key2':'value2'}`` works.)
-* 0.8 : Supports django 1.2
 
-        Supports callable and json serializable objects as default
-        
-        Implemented get_db_prep_value()
-        
-        Add tests and test runner.
-        
-        Removed JSONTableWidget from README.
-* 0.7.1 : Don't fail when trying to install before django is installed.
-* 0.7 : First time I tagged releases.
+0.8.1
+~~~~~
+Converting to string does nothing, as serializing a model instance with a JSONField would have a string version of that field, instead of it embedded inline. (Back to pre 0.8 behaviour).
+
+Added better querying support: (``field__contains={'key':'value','key2':'value2'}`` works.)
+
+Removed JSONTableWidget from package.
+
+0.8
+~~~
+(Many thanks to `IanLewis`_ for these features)
+
+Supports django 1.2
+
+Supports callable and json serializable objects as default
+
+Implemented get_db_prep_value()
+
+Add tests and test runner.
+
+Removed JSONTableWidget from README.
+
+0.7.1
+~~~~~
+Don't fail when trying to install before django is installed.
+
+0.7
+~~~
+First time I tagged releases.
 
 
 Todo
 ----------
-
 Convert date/time objects nicely to/from ISO strings (YYYY-mm-dd HH:MM:SS 
 TZNAME). This is actually a bit tricky, as we don't know if we are expecting
 a date/time object. We may parse objects as we go, but there could be
 some performance issues with this.
 
 .. _David Cramer's blog: http://justcramer.com/2009/04/14/cleaning-up-with-json-and-sql/
+.. _IanLewis: https://bitbucket.org/IanLewis

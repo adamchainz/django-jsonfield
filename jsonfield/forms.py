@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import simplejson as json
 
-from widgets import JSONWidget, JSONTableWidget
+from widgets import JSONWidget
 
 class JSONFormField(forms.CharField):
     def __init__(self, *args, **kwargs):
@@ -25,9 +25,3 @@ class JSONFormField(forms.CharField):
                 raise forms.ValidationError(u'JSON decode error: %s' % (unicode(exc),))
         else:
             return value
-
-class JSONTableField(forms.CharField):
-    def __init__(self, *args, **kwargs):
-        kwargs['widget'] = JSONTableWidget
-        super(JSONTableField, self).__init__(*args, **kwargs)
-        
