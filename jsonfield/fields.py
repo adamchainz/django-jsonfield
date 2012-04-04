@@ -67,6 +67,8 @@ class JSONField(models.TextField):
             return self.to_python(self.get_db_prep_value(value))
         if lookup_type == "in":
             return [self.to_python(self.get_db_prep_value(v)) for v in value]
+        if lookup_type == "isnull":
+            return value
         if lookup_type in ["contains", "icontains"]:
             if isinstance(value, (list, tuple)):
                 # Need a way co combine the values with '%', but don't escape that.
