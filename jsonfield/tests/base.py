@@ -76,7 +76,8 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(2, JSONFieldTestModel.objects.filter(json__contains={'foo':'bar'}).count())
         self.assertEquals(1, JSONFieldTestModel.objects.filter(json__contains={'baz':'bing', 'foo':'bar'}).count())
         self.assertEquals(2, JSONFieldTestModel.objects.filter(json__contains='foo').count())
-        #self.assertEquals(1, JSONFieldTestModel.objects.filter(json__contains=['baz', 'foo']).count())
+        # This code needs to be implemented!
+        self.assertRaises(TypeError, lambda:JSONFieldTestModel.objects.filter(json__contains=['baz', 'foo']))
         
     def test_query_isnull(self):
         JSONFieldTestModel.objects.create(json=None)
