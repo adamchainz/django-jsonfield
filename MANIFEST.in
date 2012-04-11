@@ -1,1 +1,2 @@
 recursive-include jsonfield *
+include README.rst
