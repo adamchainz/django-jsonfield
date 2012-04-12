@@ -30,12 +30,12 @@ class JSONField(models.TextField):
         'invalid': _(u"Enter a valid JSON string.")
     }
     description = "JSON object"
-
+    
     def formfield(self, **kwargs):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
     
-    def validate(self, value):
-        if self.required and not value:
+    def validate(self, value, model_instance):
+        if not self.null and not value:
             raise ValidationError(self.error_messages['required'])
         try:
             self.get_db_prep_value(value)
