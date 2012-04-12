@@ -1,8 +1,9 @@
+import os
 from setuptools import setup
 
 setup(
     name = "django-jsonfield",
-    version = '0.8.2',
+    version = open(os.path.join(os.path.dirname(__file__), 'jsonfield', 'VERSION')).read().strip(),
     description = "JSONField for django models",
     long_description = open("README.rst").read(),
     url = "http://bitbucket.org/schinckel/django-jsonfield/",

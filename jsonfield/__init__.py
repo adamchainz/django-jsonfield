@@ -1,4 +1,5 @@
-__version__ = "0.7.1"
+import os
+__version__ = open(os.path.join(os.path.dirname(__file__),'VERSION')).read().strip()
 
 # Temporary fix to not fail when django is not yet installed.
 try:

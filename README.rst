@@ -39,10 +39,13 @@ This allows you to convert a python data structure into JSON within a template::
   
 History
 ----------
+0.8.3
+~~~~~
+Store the version number in one place only, now.
+
 0.8.2
 ~~~~~
 Oops. Packaging error prevented install from pypi. Added README.rst to manifest.
-
 
 0.8.1
 ~~~~~
