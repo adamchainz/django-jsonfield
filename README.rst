@@ -39,6 +39,10 @@ This allows you to convert a python data structure into JSON within a template::
   
 History
 ----------
+0.8.4
+~~~~~
+Ensure the version number file is installed with the package.
+
 0.8.3
 ~~~~~
 Store the version number in one place only, now.
