@@ -39,6 +39,10 @@ This allows you to convert a python data structure into JSON within a template::
   
 History
 ----------
+0.8.5
+~~~~~
+Allow for '{}' and '[]', and make them not appear to be None.
+
 0.8.4
 ~~~~~
 Ensure the version number file is installed with the package.
