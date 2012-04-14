@@ -38,8 +38,8 @@ class JSONFieldTest(DjangoTestCase):
     def test_db_prep_save(self):
         field = JSONField(u"test")
         field.set_attributes_from_name("json")
-        self.assertEquals(None, field.get_db_prep_save(None))
-        self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}))
+        self.assertEquals(None, field.get_db_prep_save(None, None))
+        self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}, None))
 
     @unittest.expectedFailure
     def test_value_to_string(self):
