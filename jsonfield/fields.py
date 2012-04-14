@@ -35,7 +35,7 @@ class JSONField(models.TextField):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
     
     def validate(self, value, model_instance):
-        if not self.null and not value:
+        if not self.null and value is None:
             raise ValidationError(self.error_messages['null'])
         try:
             self.get_db_prep_value(value)
