@@ -3,10 +3,7 @@
 from django.test import TestCase as DjangoTestCase
 from django.utils import unittest
 
-from jsonfield.tests.jsonfield_test_app.models import (
-    JSONFieldTestModel,
-    JSONFieldWithDefaultTestModel,
-)
+from jsonfield.tests.jsonfield_test_app.models import *
 from jsonfield import JSONField
 
 class JSONFieldTest(DjangoTestCase):
@@ -86,3 +83,14 @@ class JSONFieldTest(DjangoTestCase):
         
         self.assertEquals(1, JSONFieldTestModel.objects.filter(json=None).count())
         self.assertEquals(None, JSONFieldTestModel.objects.get(json=None).json)
+    
+    def test_jsonfield_blank(self):
+        BlankJSONFieldTestModel.objects.create(blank_json='', null_json=None)
+        obj = BlankJSONFieldTestModel.objects.get()
+        self.assertEquals(None, obj.null_json)
+        self.assertEquals("", obj.blank_json)
+        obj.save()
+        obj = BlankJSONFieldTestModel.objects.get()
+        self.assertEquals(None, obj.null_json)
+        self.assertEquals("", obj.blank_json)
+        

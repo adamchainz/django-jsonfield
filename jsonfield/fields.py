@@ -27,7 +27,7 @@ class JSONField(models.TextField):
     """
     __metaclass__ = models.SubfieldBase
     default_error_messages = {
-        'invalid': _(u"Enter a valid JSON string.")
+        'invalid': _(u"'%s' is not a valid JSON string.")
     }
     description = "JSON object"
     
@@ -51,14 +51,25 @@ class JSONField(models.TextField):
 
     def to_python(self, value):
         if isinstance(value, basestring):
-            if value == "":
+            if value is None:
                 return None
-            value = json.loads(value)
+            if value == "":
+                if self.null:
+                    return None
+                if self.blank:
+                    return ""
+            try:
+                value = json.loads(value)
+            except ValueError:
+                msg = self.error_messages['invalid'] % str(value)
+                raise ValidationError(msg)
         # TODO: Look for date/time/datetime objects within the structure?
         return value
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
         if value is None:
+            if not self.null and self.blank:
+                return ""
             return None
         return json.dumps(value, default=default)
     
