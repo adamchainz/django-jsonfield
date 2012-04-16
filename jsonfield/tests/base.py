@@ -32,11 +32,13 @@ class JSONFieldTest(DjangoTestCase):
         obj2 = JSONFieldTestModel.objects.get(id=10)
         self.assertEquals(obj2.json, None)
 
+    # There is currently an issue where django 1.4 wants a connection arg, but 1.3
+    # doesn't.
     def test_db_prep_save(self):
         field = JSONField(u"test")
         field.set_attributes_from_name("json")
-        self.assertEquals(None, field.get_db_prep_save(None, None))
-        self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}, None))
+        self.assertEquals(None, field.get_db_prep_save(None))
+        self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}))
 
     @unittest.expectedFailure
     def test_value_to_string(self):
