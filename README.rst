@@ -40,6 +40,10 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.8.8
+~~~~~
+Prevent circular import problem with django 1.3.1 and gargoyle.
+
 0.8.7
 ~~~~~
 Better handle null=True and blank=True: it should make sense what they do now.
