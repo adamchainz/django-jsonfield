@@ -40,6 +40,10 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.8.9
+~~~~~
+Allow ``{{ variable|jsonify }}`` to work with querysets.
+
 0.8.8
 ~~~~~
 Prevent circular import problem with django 1.3.1 and gargoyle.

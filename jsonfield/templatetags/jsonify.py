@@ -7,4 +7,6 @@ register = template.Library()
 
 @register.filter
 def jsonify(value):
+    if getattr(value, 'all'):
+        value = list(value)
     return mark_safe(json.dumps(value, cls=TZAwareJSONEncoder))
