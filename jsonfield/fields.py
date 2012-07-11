@@ -31,6 +31,13 @@ class JSONField(models.TextField):
     }
     description = "JSON object"
     
+    def contribute_to_class(self, cls, name):
+        assert self.null or self.blank or self.default not in ['', models.fields.NOT_PROVIDED], \
+            "JSONField '%s' in '%s' must contain one of null=True, blank=True or non-empty string default." % (
+                name, cls.__name__
+            )
+        super(JSONField, self).contribute_to_class(cls, name)
+        
     def formfield(self, **kwargs):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
     
