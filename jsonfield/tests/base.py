@@ -102,11 +102,18 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals("", obj.blank_json)
     
     def test_invalid_default_value(self):
-        def make_model():
+        def no_default():
             class InvalidFieldModel(models.Model):
                 json = JSONField()
                 class Meta:
                     app_label = 'jsonfield'
         
-        self.assertRaises(AssertionError, make_model)
+        # self.assertRaises(AssertionError, no_default)
         
+        def bad_default():
+            class InvalidFieldModel(models.Model):
+                json = JSONField(default="foo")
+                class Meta:
+                    app_label = 'jsonfield'
+                
+        self.assertRaises(AssertionError, bad_default)

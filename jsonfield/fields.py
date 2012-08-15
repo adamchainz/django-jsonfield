@@ -31,12 +31,15 @@ class JSONField(models.TextField):
     }
     description = "JSON object"
     
-    def contribute_to_class(self, cls, name):
-        assert self.null or self.blank or self.default not in ['', models.fields.NOT_PROVIDED], \
-            "JSONField '%s' in '%s' must contain one of null=True, blank=True or non-empty string default." % (
-                name, cls.__name__
-            )
-        super(JSONField, self).contribute_to_class(cls, name)
+    def __init__(self, *args, **kwargs):
+        if not kwargs.get('null', False):
+            kwargs['default'] = kwargs.get('default', {})
+        super(JSONField, self).__init__(*args, **kwargs)
+        if 'default' in kwargs:
+            if callable(self.default):
+                self.validate(self.default(), None)
+            else:
+                self.validate(self.default, None)
         
     def formfield(self, **kwargs):
         return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
@@ -74,6 +77,9 @@ class JSONField(models.TextField):
         return value
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
+        return self.get_db_prep_value(value)
+    
+    def get_prep_value(self, value):
         if value is None:
             if not self.null and self.blank:
                 return ""
@@ -82,9 +88,9 @@ class JSONField(models.TextField):
     
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type in ["exact", "iexact"]:
-            return self.to_python(self.get_db_prep_value(value))
+            return self.to_python(self.get_prep_value(value))
         if lookup_type == "in":
-            return [self.to_python(self.get_db_prep_value(v)) for v in value]
+            return [self.to_python(self.get_prep_value(v)) for v in value]
         if lookup_type == "isnull":
             return value
         if lookup_type in ["contains", "icontains"]:
@@ -93,10 +99,10 @@ class JSONField(models.TextField):
                     lookup_type, type(value).__name__
                 ))
                 # Need a way co combine the values with '%', but don't escape that.
-                return self.get_db_prep_value(value)[1:-1].replace(', ', r'%')
+                return self.get_prep_value(value)[1:-1].replace(', ', r'%')
             if isinstance(value, dict):
-                return self.get_db_prep_value(value)[1:-1]
-            return self.to_python(self.get_db_prep_value(value))
+                return self.get_prep_value(value)[1:-1]
+            return self.to_python(self.get_prep_value(value))
         raise TypeError('Lookup type %r not supported' % lookup_type)
 
     def value_to_string(self, obj):
