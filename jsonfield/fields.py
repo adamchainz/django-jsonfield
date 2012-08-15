@@ -48,9 +48,9 @@ class JSONField(models.TextField):
         if not self.null and value is None:
             raise ValidationError(self.error_messages['null'])
         try:
-            self.get_db_prep_value(value)
+            self.get_prep_value(value)
         except:
-            raise ValidationError(self.error_messages['invalid'])
+            raise ValidationError(self.error_messages['invalid'] % value)
 
     def get_default(self):
         if self.has_default():
@@ -77,7 +77,7 @@ class JSONField(models.TextField):
         return value
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
-        return self.get_db_prep_value(value)
+        return self.get_prep_value(value)
     
     def get_prep_value(self, value):
         if value is None:

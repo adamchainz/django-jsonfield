@@ -38,22 +38,6 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(None, field.get_db_prep_save(None, connection=None))
         self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}, connection=None))
 
-    @unittest.expectedFailure
-    def test_value_to_string(self):
-        """
-        This is a failure because I'm not sure that value_to_string is the
-        right name for this method in django: what we are really doing is
-        preparing for serialisation. Since we want to embed the JSON object
-        in our other JSON structure, in my case, anyway, I actually want
-        this to return the python object, not a JSON serialisation of it!
-        """
-        field = JSONField(u"test")
-        field.set_attributes_from_name("json")
-        obj = JSONFieldTestModel(json='''{
-            "spam": "eggs"
-        }''')
-        self.assertEquals(u'{"spam": "eggs"}', field.value_to_string(obj))
-
     def test_formfield(self):
         from jsonfield.forms import JSONFormField
         from jsonfield.widgets import JSONWidget
@@ -100,20 +84,3 @@ class JSONFieldTest(DjangoTestCase):
         obj = BlankJSONFieldTestModel.objects.get()
         self.assertEquals(None, obj.null_json)
         self.assertEquals("", obj.blank_json)
-    
-    def test_invalid_default_value(self):
-        def no_default():
-            class InvalidFieldModel(models.Model):
-                json = JSONField()
-                class Meta:
-                    app_label = 'jsonfield'
-        
-        # self.assertRaises(AssertionError, no_default)
-        
-        def bad_default():
-            class InvalidFieldModel(models.Model):
-                json = JSONField(default="foo")
-                class Meta:
-                    app_label = 'jsonfield'
-                
-        self.assertRaises(AssertionError, bad_default)

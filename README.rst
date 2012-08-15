@@ -22,6 +22,12 @@ Now, it will validate the JSON on entry, and store it as a string in the
 database.  When you instantiate/fetch the object, it will be turned back
 into a python list/dict/string.
 
+Notes
+~~~~~
+
+If no ``default`` is provided, and ``null=True`` is not passed in to the
+field constructor, then a default of ``{}`` will be used.
+
 There are also a couple of other bits and bobs:
 
 Extras
