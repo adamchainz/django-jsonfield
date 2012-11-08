@@ -9,6 +9,8 @@ import datetime
 from forms import JSONFormField
 
 def default(o):
+    if hasattr(o, 'to_json'):
+        return o.to_json()
     if isinstance(o, Decimal):
         return str(o)
     if isinstance(o, datetime.datetime):
@@ -61,8 +63,6 @@ class JSONField(models.TextField):
 
     def to_python(self, value):
         if isinstance(value, basestring):
-            if value is None:
-                return None
             if value == "":
                 if self.null:
                     return None
