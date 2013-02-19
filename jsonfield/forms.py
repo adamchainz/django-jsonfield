@@ -3,9 +3,11 @@ from django.utils import simplejson as json
 
 from widgets import JSONWidget
 
+
 class JSONFormField(forms.CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['widget'] = JSONWidget
+        if 'widget' not in kwargs:
+            kwargs['widget'] = JSONWidget
         super(JSONFormField, self).__init__(*args, **kwargs)
 
     def clean(self, value):
@@ -16,12 +18,14 @@ class JSONFormField(forms.CharField):
         widget. So, if we have an object that isn't a string, then for now
         we will assume that is where it has come from.
         """
-        if not value: 
+        if not value:
             return value
         if isinstance(value, basestring):
             try:
                 return json.loads(value)
             except Exception, exc:
-                raise forms.ValidationError(u'JSON decode error: %s' % (unicode(exc),))
+                raise forms.ValidationError(
+                    u'JSON decode error: %s' % (unicode(exc),)
+                )
         else:
             return value
