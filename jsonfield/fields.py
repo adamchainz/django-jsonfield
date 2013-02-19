@@ -108,6 +108,41 @@ class JSONField(models.TextField):
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj)
 
+class TypedJSONField(JSONField):
+    """
+    
+    """
+    def __init__(self, *args, **kwargs):
+        self.json_required_fields = kwargs.pop('required_fields', {})
+        self.json_validators = kwargs.pop('validators', [])
+        
+        super(TypedJSONField, self).__init__(*args, **kwargs)
+    
+    def cast_required_fields(self, obj):
+        for field_name, field_type in self.json_required_fields.items():
+            obj[field_name] = field_type.to_python(obj[field_name])
+        
+    def to_python(self, value):
+        value = super(TypedJSONField, self).to_python(value)
+        
+        if isinstance(value, list):
+            for item in value:
+                self.cast_required_fields(item)
+        else:
+            self.cast_required_fields(value)
+        
+        return value
+    
+    def validate(self, value, model_instance):
+        super(TypedJSONField, self).validate(value, model_instance)
+        
+        for v in self.json_validators:
+            if isinstance(value, list):
+                for item in value:
+                    v(item)
+            else:
+                v(value)
+    
 try:
     from south.modelsinspector import add_introspection_rules
     add_introspection_rules([], ['^jsonfield\.fields\.JSONField'])
