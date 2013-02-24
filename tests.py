@@ -34,7 +34,7 @@ def main():
     global_settings.STATIC_URL = "/static/"
     global_settings.MEDIA_ROOT = os.path.join(BASE_PATH, 'static')
     global_settings.STATIC_ROOT = global_settings.MEDIA_ROOT
-
+    
     from django.test.utils import get_runner
     test_runner = get_runner(global_settings)
 

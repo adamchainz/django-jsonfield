@@ -6,24 +6,11 @@ from django.utils.translation import ugettext_lazy as _
 from decimal import Decimal
 import datetime
 
+from utils import default
+from widgets import JSONWidget
 from forms import JSONFormField
 
-def default(o):
-    if hasattr(o, 'to_json'):
-        return o.to_json()
-    if isinstance(o, Decimal):
-        return str(o)
-    if isinstance(o, datetime.datetime):
-        return o.strftime("%Y-%m-%dT%H:%M:%S")
-    if isinstance(o, datetime.date):
-        return o.strftime("%Y-%m-%d")
-    if isinstance(o, datetime.time):
-        return o.strftime("%H:%M:%S")
-
-    raise TypeError(repr(o) + " is not JSON serializable")
-
-
-class JSONField(models.TextField):
+class JSONField(models.Field):
     """
     A field that will ensure the data entered into it is valid JSON.
     """
@@ -31,7 +18,7 @@ class JSONField(models.TextField):
     default_error_messages = {
         'invalid': _(u"'%s' is not a valid JSON string.")
     }
-    description = "JSON object"
+    description = _("JSON object")
     
     def __init__(self, *args, **kwargs):
         if not kwargs.get('null', False):
@@ -44,7 +31,12 @@ class JSONField(models.TextField):
                 self.validate(self.default, None)
         
     def formfield(self, **kwargs):
-        return super(JSONField, self).formfield(form_class=JSONFormField, **kwargs)
+        defaults = {
+            'form_class': JSONFormField,
+            'widget': JSONWidget
+        }
+        defaults.update(**kwargs)
+        return super(JSONField, self).formfield(**defaults)
     
     def validate(self, value, model_instance):
         if not self.null and value is None:
