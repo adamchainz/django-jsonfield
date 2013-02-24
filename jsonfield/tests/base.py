@@ -4,7 +4,7 @@ from django.test import TestCase as DjangoTestCase
 from django.utils import unittest
 
 from jsonfield.tests.jsonfield_test_app.models import *
-from jsonfield import JSONField
+from jsonfield.fields import JSONField
 
 class JSONFieldTest(DjangoTestCase):
     def test_json_field(self):
