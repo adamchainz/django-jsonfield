@@ -18,7 +18,7 @@ class JSONField(models.Field):
     default_error_messages = {
         'invalid': _(u"'%s' is not a valid JSON string.")
     }
-    description = _("JSON object")
+    description = "JSON object"
     
     def __init__(self, *args, **kwargs):
         if not kwargs.get('null', False):
@@ -53,6 +53,13 @@ class JSONField(models.Field):
             return self.default
         return super(JSONField, self).get_default()
 
+    def get_internal_type(self):
+        return 'TextField'
+    
+    def db_type(self, connection):
+        # Test to see if we support JSON
+        return 'json'
+    
     def to_python(self, value):
         if isinstance(value, basestring):
             if value == "":
@@ -138,5 +145,6 @@ class TypedJSONField(JSONField):
 try:
     from south.modelsinspector import add_introspection_rules
     add_introspection_rules([], ['^jsonfield\.fields\.JSONField'])
+    add_introspection_rules([], ['^jsonfield\.fields\.TypedJSONField'])
 except ImportError:
     pass
