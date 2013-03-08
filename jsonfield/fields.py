@@ -118,6 +118,8 @@ class TypedJSONField(JSONField):
         super(TypedJSONField, self).__init__(*args, **kwargs)
     
     def cast_required_fields(self, obj):
+        if not obj:
+            return
         for field_name, field_type in self.json_required_fields.items():
             obj[field_name] = field_type.to_python(obj[field_name])
         
