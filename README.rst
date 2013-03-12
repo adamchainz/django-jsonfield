@@ -49,6 +49,11 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.9.1
+~~~~~
+Add support for storing data using Postgres' 9.2's JSON data type.
+
+
 0.9.0
 ~~~~~
 Add LICENSE file.
