@@ -35,6 +35,8 @@ def main():
     global_settings.MEDIA_ROOT = os.path.join(BASE_PATH, 'static')
     global_settings.STATIC_ROOT = global_settings.MEDIA_ROOT
     
+    global_settings.SECRET_KEY = '334ebe58-a77d-4321-9d01-a7d2cb8d3eea'
+    
     from django.test.utils import get_runner
     test_runner = get_runner(global_settings)
 

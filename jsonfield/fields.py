@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, DatabaseError
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
@@ -58,7 +58,13 @@ class JSONField(models.Field):
     
     def db_type(self, connection):
         # Test to see if we support JSON
-        return 'json'
+        cursor = connection.cursor()
+        try:
+            cursor.execute('SELECT \'{"a":"json object"}\'::json;')
+        except DatabaseError:
+            return 'text'
+        else:
+            return 'json'
     
     def to_python(self, value):
         if isinstance(value, basestring):
