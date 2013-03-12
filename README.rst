@@ -22,6 +22,9 @@ Now, it will validate the JSON on entry, and store it as a string in the
 database.  When you instantiate/fetch the object, it will be turned back
 into a python list/dict/string.
 
+There is also a ``TypedJSONField``, that allows you to define data types that must be included within each object in the array. More documentation to follow.
+
+
 Notes
 ~~~~~
 
@@ -46,6 +49,12 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.9.0
+~~~~~
+Add LICENSE file.
+Added TypedJSONField.
+
+ 
 0.8.10
 ~~~~~~
 Allow ``{{ variable|jsonify }}`` to work with querysets.
