@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.db import models, DatabaseError
+from django.db import models, DatabaseError, transaction
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
@@ -60,8 +60,10 @@ class JSONField(models.Field):
         # Test to see if we support JSON
         cursor = connection.cursor()
         try:
+            sid = transaction.savepoint()
             cursor.execute('SELECT \'{"a":"json object"}\'::json;')
         except DatabaseError:
+            transaction.savepoint_rollback(sid)
             return 'text'
         else:
             return 'json'
