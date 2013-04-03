@@ -15,10 +15,14 @@ def default(o):
     if isinstance(o, Decimal):
         return str(o)
     if isinstance(o, datetime.datetime):
+        if o.tzinfo:
+            return o.strftime('%Y-%m-%dT%H:%M:%S%z')
         return o.strftime("%Y-%m-%dT%H:%M:%S")
     if isinstance(o, datetime.date):
         return o.strftime("%Y-%m-%d")
     if isinstance(o, datetime.time):
+        if o.tzinfo:
+            return o.strftime('%H:%M:%S%z')
         return o.strftime("%H:%M:%S")
 
     raise TypeError(repr(o) + " is not JSON serializable")
