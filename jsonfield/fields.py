@@ -57,11 +57,12 @@ class JSONField(models.Field):
         return 'TextField'
     
     def db_type(self, connection):
-        # Test to see if we support JSON
+        # Test to see if we support JSON querying.
+        # (Protip: nothing does, at this stage).
         cursor = connection.cursor()
         try:
             sid = transaction.savepoint()
-            cursor.execute('SELECT \'{"a":"json object"}\'::json;')
+            cursor.execute('SELECT \'{}\'::json = \'{}\'::json;')
         except DatabaseError:
             transaction.savepoint_rollback(sid)
             return 'text'
