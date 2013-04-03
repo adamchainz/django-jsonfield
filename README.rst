@@ -54,6 +54,8 @@ History
 Remove support for storing data using Postgres' 9.2's JSON data type, as
 you cannot currently query against this!
 
+Remove support for django < 1.3.
+
 
 0.9.0
 ~~~~~
