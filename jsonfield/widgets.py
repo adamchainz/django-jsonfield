@@ -2,7 +2,7 @@ from django import forms
 from django.utils import simplejson as json
 from django.conf import settings
 
-from utils import default
+from .utils import default
 
 class JSONWidget(forms.Textarea):
     def render(self, name, value, attrs=None):
