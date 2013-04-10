@@ -16,3 +16,4 @@ dist
 syntax: regexp
 .*\#.*\#$ 
 .test
+.tox
