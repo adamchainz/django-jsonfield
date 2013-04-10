@@ -89,7 +89,9 @@ class JSONFieldTest(DjangoTestCase):
         obj = BlankJSONFieldTestModel.objects.get()
         self.assertEquals(None, obj.null_json)
         self.assertEquals("", obj.blank_json)
-        obj.save()
+        obj.delete()
+        
+        BlankJSONFieldTestModel.objects.create(blank_json=None, null_json="")
         obj = BlankJSONFieldTestModel.objects.get()
         self.assertEquals(None, obj.null_json)
         self.assertEquals("", obj.blank_json)

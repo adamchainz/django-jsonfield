@@ -88,6 +88,8 @@ First time I tagged releases.
 
 Todo
 ----------
+Allow for passing in a function to use for processing unknown data types.
+
 Convert date/time objects nicely to/from ISO strings (YYYY-mm-dd HH:MM:SS 
 TZNAME). This is actually a bit tricky, as we don't know if we are expecting
 a date/time object. We may parse objects as we go, but there could be
