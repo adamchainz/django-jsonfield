@@ -1,6 +1,8 @@
 django-jsonfield
 ===================
 
+.. image:: https://drone.io/bitbucket.org/schinckel/django-jsonfield/status.png
+
 I had a serious need for a JSON field for django. There were a couple out
 there, but none packaged up nicely on bitbucket/github that were usable
 with ``pip install -e``.
