@@ -4,7 +4,7 @@ from django.test import TestCase as DjangoTestCase
 from django.utils import unittest
 
 from jsonfield.tests.jsonfield_test_app.models import *
-from jsonfield import JSONField
+from jsonfield.fields import JSONField
 
 class JSONFieldTest(DjangoTestCase):
     def test_json_field(self):
@@ -35,17 +35,8 @@ class JSONFieldTest(DjangoTestCase):
     def test_db_prep_save(self):
         field = JSONField(u"test")
         field.set_attributes_from_name("json")
-        self.assertEquals(None, field.get_db_prep_save(None, None))
-        self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}, None))
-
-    @unittest.expectedFailure
-    def test_value_to_string(self):
-        field = JSONField(u"test")
-        field.set_attributes_from_name("json")
-        obj = JSONFieldTestModel(json='''{
-            "spam": "eggs"
-        }''')
-        self.assertEquals(u'{"spam": "eggs"}', field.value_to_string(obj))
+        self.assertEquals(None, field.get_db_prep_save(None, connection=None))
+        self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}, connection=None))
 
     def test_formfield(self):
         from jsonfield.forms import JSONFormField
@@ -89,10 +80,7 @@ class JSONFieldTest(DjangoTestCase):
         obj = BlankJSONFieldTestModel.objects.get()
         self.assertEquals(None, obj.null_json)
         self.assertEquals("", obj.blank_json)
-        obj.delete()
-        
-        BlankJSONFieldTestModel.objects.create(blank_json=None, null_json="")
+        obj.save()
         obj = BlankJSONFieldTestModel.objects.get()
         self.assertEquals(None, obj.null_json)
         self.assertEquals("", obj.blank_json)
-        
