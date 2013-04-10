@@ -1,22 +1,25 @@
+from __future__ import unicode_literals
+
 from django.core.exceptions import ValidationError
 from django.db import models, DatabaseError, transaction
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
+from django.utils import six
 
 from decimal import Decimal
 import datetime
 
-from utils import default
-from widgets import JSONWidget
-from forms import JSONFormField
+from .utils import default
+from .widgets import JSONWidget
+from .forms import JSONFormField
 
-class JSONField(models.Field):
+class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     A field that will ensure the data entered into it is valid JSON.
     """
     __metaclass__ = models.SubfieldBase
     default_error_messages = {
-        'invalid': _(u"'%s' is not a valid JSON string.")
+        'invalid': _("'%s' is not a valid JSON string.")
     }
     description = "JSON object"
     
@@ -70,7 +73,7 @@ class JSONField(models.Field):
             return 'json'
     
     def to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             if value == "":
                 if self.null:
                     return None

@@ -1,5 +1,4 @@
 #:coding=utf-8:
-
 from django.test import TestCase as DjangoTestCase
 from django.utils import unittest
 
@@ -33,7 +32,7 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(obj2.json, None)
 
     def test_db_prep_save(self):
-        field = JSONField(u"test")
+        field = JSONField("test")
         field.set_attributes_from_name("json")
         self.assertEquals(None, field.get_db_prep_save(None, connection=None))
         self.assertEquals('{"spam": "eggs"}', field.get_db_prep_save({"spam": "eggs"}, connection=None))
@@ -41,7 +40,7 @@ class JSONFieldTest(DjangoTestCase):
     def test_formfield(self):
         from jsonfield.forms import JSONFormField
         from jsonfield.widgets import JSONWidget
-        field = JSONField(u"test")
+        field = JSONField("test")
         field.set_attributes_from_name("json")
         formfield = field.formfield()
         self.assertEquals(type(formfield), JSONFormField)
