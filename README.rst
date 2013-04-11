@@ -131,7 +131,7 @@ Allow for passing in a function to use for processing unknown data types.
 Convert date/time objects nicely to/from ISO strings (YYYY-mm-dd HH:MM:SS 
 TZNAME). This is actually a bit tricky, as we don't know if we are expecting
 a date/time object. We may parse objects as we go, but there could be
-some performance issues with this.
+some performance issues with this. I'm tempted to say "only do this on TypedJSONField()"
 
 .. _David Cramer's blog: http://justcramer.com/2009/04/14/cleaning-up-with-json-and-sql/
 .. _IanLewis: https://bitbucket.org/IanLewis
