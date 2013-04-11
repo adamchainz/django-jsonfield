@@ -17,3 +17,9 @@ class BlankJSONFieldTestModel(models.Model):
     blank_json = JSONField(blank=True)
     class Meta:
         app_label = 'jsonfield'
+
+class CallableDefaultModel(models.Model):
+    json = JSONField(default=lambda:{'x':2})
+    
+    class Meta:
+        app_label = 'jsonfield'

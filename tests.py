@@ -32,6 +32,7 @@ def main(db_engine='sqlite3'):
     global_settings.STATIC_ROOT = global_settings.MEDIA_ROOT
     
     global_settings.SECRET_KEY = '334ebe58-a77d-4321-9d01-a7d2cb8d3eea'
+    global_settings.TEST_RUNNER = 'django_coverage.coverage_runner.CoverageRunner'
     
     from django.test.utils import get_runner
     test_runner = get_runner(global_settings)
