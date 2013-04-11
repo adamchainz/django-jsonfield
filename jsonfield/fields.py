@@ -25,6 +25,9 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
     def __init__(self, *args, **kwargs):
         if not kwargs.get('null', False):
             kwargs['default'] = kwargs.get('default', {})
+        self.encoder_kwargs = {
+            'indent': kwargs.get('indent', getattr(settings, 'JSONFIELD_INDENT', 2))
+        }
         super(JSONField, self).__init__(*args, **kwargs)
         if 'default' in kwargs:
             if callable(self.default):
@@ -94,7 +97,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             if not self.null and self.blank:
                 return ""
             return None
-        return json.dumps(value, default=default)
+        return json.dumps(value, default=default, **self.encoder_kwargs)
     
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type in ["exact", "iexact"]:
