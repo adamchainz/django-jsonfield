@@ -83,3 +83,13 @@ class JSONFieldTest(DjangoTestCase):
         obj = BlankJSONFieldTestModel.objects.get()
         self.assertEquals(None, obj.null_json)
         self.assertEquals("", obj.blank_json)
+    
+    def test_callable_default(self):
+        CallableDefaultModel.objects.create()
+        obj = CallableDefaultModel.objects.get()
+        self.assertEquals({'x':2}, obj.json)
+    
+    def test_callable_default_overridden(self):
+        CallableDefaultModel.objects.create(json={'x':3})
+        obj = CallableDefaultModel.objects.get()
+        self.assertEquals({'x':3}, obj.json)
