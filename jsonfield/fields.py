@@ -17,7 +17,6 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     A field that will ensure the data entered into it is valid JSON.
     """
-    __metaclass__ = models.SubfieldBase
     default_error_messages = {
         'invalid': _("'%s' is not a valid JSON string.")
     }
