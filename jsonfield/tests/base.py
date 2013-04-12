@@ -1,6 +1,7 @@
 #:coding=utf-8:
 from django.test import TestCase as DjangoTestCase
 from django.utils import unittest
+from django import forms
 
 from jsonfield.tests.jsonfield_test_app.models import *
 from jsonfield.fields import JSONField
@@ -65,15 +66,15 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(2, JSONFieldTestModel.objects.filter(json__contains='foo').count())
         # This code needs to be implemented!
         self.assertRaises(TypeError, lambda:JSONFieldTestModel.objects.filter(json__contains=['baz', 'foo']))
-        
+
     def test_query_isnull(self):
         JSONFieldTestModel.objects.create(json=None)
         JSONFieldTestModel.objects.create(json={})
         JSONFieldTestModel.objects.create(json={'foo':'bar'})
-        
+
         self.assertEquals(1, JSONFieldTestModel.objects.filter(json=None).count())
         self.assertEquals(None, JSONFieldTestModel.objects.get(json=None).json)
-    
+
     def test_jsonfield_blank(self):
         BlankJSONFieldTestModel.objects.create(blank_json='', null_json=None)
         obj = BlankJSONFieldTestModel.objects.get()
@@ -83,13 +84,27 @@ class JSONFieldTest(DjangoTestCase):
         obj = BlankJSONFieldTestModel.objects.get()
         self.assertEquals(None, obj.null_json)
         self.assertEquals("", obj.blank_json)
-    
+
     def test_callable_default(self):
         CallableDefaultModel.objects.create()
         obj = CallableDefaultModel.objects.get()
         self.assertEquals({'x':2}, obj.json)
-    
+
     def test_callable_default_overridden(self):
         CallableDefaultModel.objects.create(json={'x':3})
         obj = CallableDefaultModel.objects.get()
         self.assertEquals({'x':3}, obj.json)
+
+    def test_mutable_default_checking(self):
+        obj1 = JSONFieldWithDefaultTestModel()
+        obj2 = JSONFieldWithDefaultTestModel()
+        
+        obj1.json['foo'] = 'bar'
+        self.assertNotIn('foo', obj2.json)
+
+    def test_invalid_json(self):
+        obj = JSONFieldTestModel()
+        obj.json = '{"foo": 2}'
+        self.assertIn('foo', obj.json)
+        with self.assertRaises(forms.ValidationError):
+            obj.json = '{"foo"}'
