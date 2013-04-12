@@ -32,8 +32,9 @@ def main(db_engine='sqlite3'):
     global_settings.STATIC_ROOT = global_settings.MEDIA_ROOT
     
     global_settings.SECRET_KEY = '334ebe58-a77d-4321-9d01-a7d2cb8d3eea'
-    global_settings.TEST_RUNNER = 'django_coverage.coverage_runner.CoverageRunner'
-    global_settings.COVERAGE_REPORT_HTML_OUTPUT_DIR = os.path.join(BASE_PATH, '.coverage')
+    if os.environ.get('COVERAGE', None):
+        global_settings.TEST_RUNNER = 'django_coverage.coverage_runner.CoverageRunner'
+    global_settings.COVERAGE_REPORT_HTML_OUTPUT_DIR =os.path.join(BASE_PATH, '.coverage')
     global_settings.COVERAGE_USE_STDOUT = True
     
     from django.test.utils import get_runner
