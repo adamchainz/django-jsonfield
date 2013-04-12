@@ -36,6 +36,8 @@ def main(db_engine='sqlite3'):
         global_settings.TEST_RUNNER = 'django_coverage.coverage_runner.CoverageRunner'
     global_settings.COVERAGE_REPORT_HTML_OUTPUT_DIR =os.path.join(BASE_PATH, '.coverage')
     global_settings.COVERAGE_USE_STDOUT = True
+    global_settings.COVERAGE_PATH_EXCLUDES = ['.hg', 'templates', 'tests', 'sql', '__pycache__']
+    
     
     from django.test.utils import get_runner
     test_runner = get_runner(global_settings)
