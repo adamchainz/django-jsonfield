@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.db import models, DatabaseError, transaction
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
@@ -24,15 +25,17 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
     
     def __init__(self, *args, **kwargs):
         if not kwargs.get('null', False):
-            kwargs['default'] = kwargs.get('default', {})
+            kwargs['default'] = kwargs.get('default', dict)
         self.encoder_kwargs = {
-            'indent': kwargs.get('indent', getattr(settings, 'JSONFIELD_INDENT', 2))
+            'indent': kwargs.get('indent', getattr(settings, 'JSONFIELD_INDENT', None))
         }
         super(JSONField, self).__init__(*args, **kwargs)
         if 'default' in kwargs:
+            # Should this be using self.get_default()?
             if callable(self.default):
                 self.validate(self.default(), None)
             else:
+                self.default = json.dumps(self.default)
                 self.validate(self.default, None)
         
     def formfield(self, **kwargs):
