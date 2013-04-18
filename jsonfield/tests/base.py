@@ -47,6 +47,36 @@ class JSONFieldTest(DjangoTestCase):
         self.assertEquals(type(formfield), JSONFormField)
         self.assertEquals(type(formfield.widget), JSONWidget)
 
+    def test_formfield_clean_blank(self):
+        field = JSONField("test")
+        formfield = field.formfield()
+        self.assertRaisesMessage(forms.ValidationError, formfield.error_messages['required'], formfield.clean, value='')
+
+    def test_formfield_clean_none(self):
+        field = JSONField("test")
+        formfield = field.formfield()
+        self.assertRaisesMessage(forms.ValidationError, formfield.error_messages['required'], formfield.clean, value=None)
+
+    def test_formfield_null_and_blank_clean_blank(self):
+        field = JSONField("test", null=True, blank=True)
+        formfield = field.formfield()
+        self.assertEquals(formfield.clean(value=''), '')
+
+    def test_formfield_null_and_blank_clean_none(self):
+        field = JSONField("test", null=True, blank=True)
+        formfield = field.formfield()
+        self.assertEquals(formfield.clean(value=None), '')
+
+    def test_formfield_blank_clean_blank(self):
+        field = JSONField("test", null=False, blank=True)
+        formfield = field.formfield()
+        self.assertEquals(formfield.clean(value=''), '')
+
+    def test_formfield_blank_clean_none(self):
+        field = JSONField("test", null=False, blank=True)
+        formfield = field.formfield()
+        self.assertEquals(formfield.clean(value=None), '')
+
     def test_default_value(self):
         obj = JSONFieldWithDefaultTestModel.objects.create()
         obj = JSONFieldWithDefaultTestModel.objects.get(id=obj.id)
