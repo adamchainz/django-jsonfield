@@ -87,7 +87,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             try:
                 value = json.loads(value)
             except ValueError:
-                msg = self.error_messages['invalid'] % str(value)
+                msg = self.error_messages['invalid'] % value
                 raise ValidationError(msg)
         # TODO: Look for date/time/datetime objects within the structure?
         return value
