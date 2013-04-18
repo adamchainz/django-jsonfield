@@ -18,8 +18,11 @@ class JSONFormField(forms.CharField):
         widget. So, if we have an object that isn't a string, then for now
         we will assume that is where it has come from.
         """
+        value = super(JSONFormField, self).clean(value)
+
         if not value:
             return value
+
         if isinstance(value, basestring):
             try:
                 return json.loads(value)
