@@ -29,6 +29,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         self.encoder_kwargs = {
             'indent': kwargs.get('indent', getattr(settings, 'JSONFIELD_INDENT', None))
         }
+        self._db_type = kwargs.pop('db_type', None)
+        
         super(JSONField, self).__init__(*args, **kwargs)
         if 'default' in kwargs:
             # Should this be using self.get_default()?
@@ -68,6 +70,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         # Test to see if we support JSON querying.
         # (Protip: nothing does, at this stage).
         cursor = connection.cursor()
+        if self._db_type:
+            return self._db_type
         try:
             sid = transaction.savepoint()
             cursor.execute('SELECT \'{}\'::json = \'{}\'::json;')
@@ -123,6 +127,18 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
 
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj)
+        
+    
+    def south_field_triple(self):
+        "Returns a suitable description of this field for South."
+        # We'll just introspect the _actual_ field.
+        from south.modelsinspector import introspector
+        field_class = self.__class__.__module__ + "." + self.__class__.__name__
+        args, kwargs = introspector(self)
+        if self._db_type:
+            kwargs['db_type'] = "'%s'" % self._db_type
+        # That's our definition!
+        return (field_class, args, kwargs)
 
 class TypedJSONField(JSONField):
     """
@@ -161,9 +177,3 @@ class TypedJSONField(JSONField):
             else:
                 v(value)
     
-try:
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ['^jsonfield\.fields\.JSONField'])
-    add_introspection_rules([], ['^jsonfield\.fields\.TypedJSONField'])
-except ImportError:
-    pass
