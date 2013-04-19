@@ -13,6 +13,10 @@ class JSONFieldTest(DjangoTestCase):
             "spam": "eggs"
         }''')
         self.assertEquals(obj.json, {'spam':'eggs'})
+    
+    def test_json_field_db_type(self):
+        field = JSONField(db_type='json')
+        self.assertEquals('json', field.db_type())
 
     def test_json_field_empty(self):
         obj = JSONFieldTestModel(json='')
@@ -139,3 +143,4 @@ class JSONFieldTest(DjangoTestCase):
         self.assertIn('foo', obj.json)
         with self.assertRaises(forms.ValidationError):
             obj.json = '{"foo"}'
+    
