@@ -24,8 +24,9 @@ class JSONFormField(forms.CharField):
             return value
 
         if isinstance(value, basestring):
+            from .fields import OrderedDict
             try:
-                return json.loads(value)
+                return json.loads(value, object_pairs_hook=OrderedDict)
             except Exception as exc:
                 raise forms.ValidationError(
                     'JSON decode error: %s' % (unicode(exc),)
