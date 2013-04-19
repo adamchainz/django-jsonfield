@@ -1,15 +1,24 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ValidationError
+from decimal import Decimal
+import datetime
+
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.conf import settings
 from django.db import models, DatabaseError, transaction
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 
-from decimal import Decimal
-import datetime
-
+# Need to do this after importing ImproperlyConfigured
+try:
+    from collections import OrderedDict
+except ImportError:
+    try:
+        from ordereddict import OrderedDict
+    except ImportError:
+        raise ImproperlyConfigured('You must install ordereddict under python2.6')
+        
 from .utils import default
 from .widgets import JSONWidget
 from .forms import JSONFormField
@@ -85,7 +94,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
                 if self.blank:
                     return ""
             try:
-                value = json.loads(value)
+                value = json.loads(value, object_pairs_hook=OrderedDict)
             except ValueError:
                 msg = self.error_messages['invalid'] % value
                 raise ValidationError(msg)
