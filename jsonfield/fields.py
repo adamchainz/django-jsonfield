@@ -35,7 +35,9 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             if callable(self.default):
                 self.validate(self.default(), None)
             else:
-                self.default = json.dumps(self.default)
+                # Maybe check to see if this is a string, and try
+                # loads-ing it first?
+                self.default = json.loads(json.dumps(self.default))
                 self.validate(self.default, None)
         
     def formfield(self, **kwargs):
