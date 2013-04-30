@@ -51,6 +51,11 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.9.4
+~~~~~
+Fixes for mutable defaults: we serialize and then deserialize in this
+case, so you can still use ``default={}``.
+
 0.9.3
 ~~~~~
 Remove support for storing data using Postgres' 9.2's JSON data type, as
