@@ -139,3 +139,7 @@ class JSONFieldTest(DjangoTestCase):
         self.assertIn('foo', obj.json)
         with self.assertRaises(forms.ValidationError):
             obj.json = '{"foo"}'
+
+    def test_invalid_json_default(self):
+        with self.assertRaises(ValueError):
+            field = JSONField('test', default='{"foo"}')

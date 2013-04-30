@@ -30,15 +30,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             'indent': kwargs.get('indent', getattr(settings, 'JSONFIELD_INDENT', None))
         }
         super(JSONField, self).__init__(*args, **kwargs)
-        if 'default' in kwargs:
-            # Should this be using self.get_default()?
-            if callable(self.default):
-                self.validate(self.default(), None)
-            else:
-                # Maybe check to see if this is a string, and try
-                # loads-ing it first?
-                self.default = json.loads(json.dumps(self.default))
-                self.validate(self.default, None)
+        self.validate(self.get_default(), None)
         
     def formfield(self, **kwargs):
         defaults = {
@@ -58,9 +50,12 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
 
     def get_default(self):
         if self.has_default():
-            if callable(self.default):
-                return self.default()
-            return self.default
+            default = self.default
+            if callable(default):
+                default = default()
+            if isinstance(default, six.string_types):
+                return json.loads(default)
+            return json.loads(json.dumps(default))
         return super(JSONField, self).get_default()
 
     def get_internal_type(self):
