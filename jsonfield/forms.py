@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import simplejson as json
 
-from .widgets import JSONWidget
+from .widgets import JSONWidget, JSONCheckboxWidget
 
 
 class JSONFormField(forms.CharField):
@@ -32,3 +32,7 @@ class JSONFormField(forms.CharField):
                 )
         else:
             return value
+
+
+class JSONCheckboxField(forms.TypedMultipleChoiceField):
+    widget = JSONCheckboxWidget

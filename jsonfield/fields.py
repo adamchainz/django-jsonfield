@@ -176,4 +176,10 @@ class TypedJSONField(JSONField):
                     v(item)
             else:
                 v(value)
+
+class SettingsField(JSONField):
+    def __init__(self, *args, **kwargs):
+        self.choices = kwargs.pop('choices')
+        super(SettingsField, self).__init__(*args, **kwargs)
+    
     
