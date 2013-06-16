@@ -16,3 +16,6 @@ class JSONWidget(forms.Textarea):
 class JSONSelectWidget(forms.SelectMultiple):
     pass
 
+
+class JSONCheckboxWidget(forms.CheckboxSelectMultiple):
+    pass
