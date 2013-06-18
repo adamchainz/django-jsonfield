@@ -12,7 +12,6 @@ setup(
     packages = [
         "jsonfield",
     ],
-    include_package_data=True,
     classifiers = [
         'Programming Language :: Python',
         'License :: OSI Approved :: BSD License',
