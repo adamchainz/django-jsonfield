@@ -19,5 +19,4 @@ setup(
         'Framework :: Django',
     ],
     test_suite='tests.main',
-    include_package_data=True,
 )
