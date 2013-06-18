@@ -12,9 +12,6 @@ syntax: glob
 MANIFEST
 build
 dist
-
-syntax: regexp
-.*\#.*\#$ 
 .test
 .tox
 .coverage
