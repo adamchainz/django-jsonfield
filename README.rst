@@ -51,9 +51,9 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
-0.9.6
+0.9.7
 ~~~~~
-Allow for using this field with tests that use freezgun.
+Remove freezegun workarounds.
 
 0.9.4
 ~~~~~
