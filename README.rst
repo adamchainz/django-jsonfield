@@ -52,6 +52,10 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.9.9
+~~~~~
+Finally strip out non-required files.
+
 0.9.8
 ~~~~~
 Remove freezegun workarounds.

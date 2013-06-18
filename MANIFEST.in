@@ -1,5 +1,6 @@
 recursive-include jsonfield *.py
-recursive-include jsonfield VERSION
+include jsonfield/VERSION
 include README.rst
 include tests.py
 include LICENSE
+recursive-exclude jsonfield *.pyc
