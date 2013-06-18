@@ -1,5 +1,6 @@
 from django import forms
 from django.utils import simplejson as json
+from django.utils import six
 
 from .widgets import JSONWidget
 
@@ -23,7 +24,7 @@ class JSONFormField(forms.CharField):
         if not value:
             return value
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             try:
                 return json.loads(value)
             except Exception as exc:
