@@ -1,5 +1,7 @@
+import json 
+
 from django import forms
-import json from django.conf import settings
+from django.conf import settings
 
 from .utils import default
 
