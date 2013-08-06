@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
+import json
 
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import models, DatabaseError, transaction
-from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 
