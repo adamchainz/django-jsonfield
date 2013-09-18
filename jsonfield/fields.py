@@ -66,10 +66,10 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         # (Protip: nothing does, at this stage).
         cursor = connection.cursor()
         try:
-            sid = transaction.savepoint()
+            sid = transaction.savepoint(using=connection.alias)
             cursor.execute('SELECT \'{}\'::json = \'{}\'::json;')
         except DatabaseError:
-            transaction.savepoint_rollback(sid)
+            transaction.savepoint_rollback(sid, using=connection.alias)
             return 'text'
         else:
             return 'json'
