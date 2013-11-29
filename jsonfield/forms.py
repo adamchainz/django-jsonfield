@@ -12,19 +12,10 @@ class JSONFormField(forms.CharField):
             kwargs['widget'] = JSONWidget
         super(JSONFormField, self).__init__(*args, **kwargs)
 
-    def clean(self, value):
-        """
-        The default is to have a TextField, and we will decode the string
-        that comes back from this. However, another use of this field is
-        to store a list of values, and use these in a MultipleSelect
-        widget. So, if we have an object that isn't a string, then for now
-        we will assume that is where it has come from.
-        """
-        value = super(JSONFormField, self).clean(value)
-
+    def to_python(self, value):
         if not value:
-            return value
-
+            return value or ''
+        
         if isinstance(value, six.string_types):
             try:
                 return json.loads(value)
@@ -34,3 +25,4 @@ class JSONFormField(forms.CharField):
                 )
         else:
             return value
+        
