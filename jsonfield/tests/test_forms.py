@@ -21,10 +21,16 @@ class JSONFormFieldTest(DjangoTestCase):
         field = JSONFormField(required=False)
         self.assertEquals([],field.clean('[]'))
     
-    def test_required_form_field(self):
+    def test_required_form_field_array(self):
         field = JSONFormField(required=True)
         self.assertEquals([], field.clean('[]'))
+        
+    def test_required_form_field_object(self):
+        field = JSONFormField(required=True)
         self.assertEquals({}, field.clean('{}'))
+    
+    def test_required_form_field_empty(self):
+        field = JSONFormField(required=True)
         with self.assertRaises(ValidationError):
             field.clean('')
     
