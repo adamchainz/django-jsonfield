@@ -58,6 +58,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
     def get_default(self):
         if self.has_default():
             default = self.default
+            if default == "":
+                return default
             if callable(default):
                 default = default()
             if isinstance(default, six.string_types):
