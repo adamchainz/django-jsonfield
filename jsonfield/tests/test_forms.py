@@ -48,9 +48,9 @@ class JSONFormTest(DjangoTestCase):
 
 class JSONFormMultipleSelectFieldTest(DjangoTestCase):
     def test_multiple_select_data(self):
-        form = JSONTestForm({'json_data': [u'SA', u'WA']})
+        form = JSONTestForm({'json_data': ['SA', 'WA']})
         assert form.is_valid()
         
-        self.assertEquals([u'SA', u'WA'], form.cleaned_data['json_data'])
+        self.assertEquals(['SA', 'WA'], form.cleaned_data['json_data'])
 
 
