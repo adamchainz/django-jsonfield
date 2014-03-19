@@ -18,9 +18,9 @@ class JSONFormField(forms.CharField):
         if isinstance(value, six.string_types) and value:
             try:
                 return json.loads(value)
-            except Exception as exc:
+            except ValueError as exc:
                 raise forms.ValidationError(
-                    'JSON decode error: %s' % (six.u(exc),)
+                    'JSON decode error: %s' % (six.u(exc.args[0]),)
                 )
         else:
             return value
