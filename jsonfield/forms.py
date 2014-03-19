@@ -20,7 +20,7 @@ class JSONFormField(forms.CharField):
                 return json.loads(value)
             except Exception as exc:
                 raise forms.ValidationError(
-                    'JSON decode error: %s' % (unicode(exc),)
+                    'JSON decode error: %s' % (six.u(exc),)
                 )
         else:
             return value
