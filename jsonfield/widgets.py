@@ -1,5 +1,6 @@
+import json 
+
 from django import forms
-from django.utils import simplejson as json
 from django.conf import settings
 
 from .utils import default
@@ -15,4 +16,3 @@ class JSONWidget(forms.Textarea):
 
 class JSONSelectWidget(forms.SelectMultiple):
     pass
-

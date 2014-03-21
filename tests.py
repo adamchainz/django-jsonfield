@@ -44,6 +44,10 @@ def main(db_engine='sqlite3'):
         test_runner = get_runner(global_settings)
 
     test_runner = test_runner()
+    
+    if getattr(django, 'setup', None):
+        django.setup()
+    
     failures = test_runner.run_tests(['jsonfield'])
     
     sys.exit(failures)

@@ -52,9 +52,19 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
-0.9.7
+0.9.12
+~~~~~~
+Cache the result of db_type.
+Handle incoming data from multiple select widget better.
+
+0.9.9
+~~~~~
+Finally strip out non-required files.
+
+0.9.8
 ~~~~~
 Remove freezegun workarounds.
+Fix broken build.
 
 0.9.4
 ~~~~~
