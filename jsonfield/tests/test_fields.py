@@ -145,6 +145,9 @@ class JSONFieldTest(DjangoTestCase):
     def test_invalid_json_default(self):
         with self.assertRaises(ValueError):
             field = JSONField('test', default='{"foo"}')
+    
+    def test_indent(self):
+        field = JSONField('test', indent=2)
 
 class SavingModelsTest(DjangoTestCase):
     def test_saving_null(self):
