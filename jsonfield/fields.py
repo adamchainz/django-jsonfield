@@ -34,7 +34,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         if not kwargs.get('null', False):
             kwargs['default'] = kwargs.get('default', dict)
         self.encoder_kwargs = {
-            'indent': kwargs.get('indent', getattr(settings, 'JSONFIELD_INDENT', None))
+            'indent': kwargs.pop('indent', getattr(settings, 'JSONFIELD_INDENT', None))
         }
         super(JSONField, self).__init__(*args, **kwargs)
         self.validate(self.get_default(), None)
