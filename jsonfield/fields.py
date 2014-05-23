@@ -129,7 +129,9 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             if isinstance(value, dict):
                 return self.get_prep_value(value)[1:-1]
             return self.to_python(self.get_prep_value(value))
-        raise TypeError('Lookup type %r not supported' % lookup_type)
+        # raise TypeError('Lookup type %r not supported' % lookup_type)
+        print value
+        return value
 
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj)
@@ -177,3 +179,7 @@ try:
     add_introspection_rules([], ['^jsonfield\.fields\.TypedJSONField'])
 except ImportError:
     pass
+
+if hasattr(JSONField, 'register_lookup'):
+    from .lookups import HasKey
+    models.Field.register_lookup(HasKey)

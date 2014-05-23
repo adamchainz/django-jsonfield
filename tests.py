@@ -56,4 +56,4 @@ def test_postgres():
     main('postgresql_psycopg2')
 
 if __name__ == '__main__':
-    main()
+    main(os.environ.get('DATABASE'))
