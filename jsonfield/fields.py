@@ -3,23 +3,16 @@ import json
 
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from django.db import models, DatabaseError, transaction
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
-from django.core.cache import cache
 
 from decimal import Decimal
 import datetime
 
-from .utils import default
+from .utils import default, db_type
 from .widgets import JSONWidget
 from .forms import JSONFormField
-from jsonfield import __version__
-
-DB_TYPE_CACHE_KEY = (
-    'django-jsonfield:db-type:%s' % __version__ +
-    '%(ENGINE)s:%(HOST)s:%(PORT)s:%(NAME)s'
-)
 
 class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
@@ -69,23 +62,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return 'TextField'
     
     def db_type(self, connection):
-        cache_key = DB_TYPE_CACHE_KEY % connection.settings_dict
-        db_type = cache.get(cache_key)
-        
-        if not db_type:
-            # Test to see if we support JSON querying.
-            cursor = connection.cursor()
-            try:
-                sid = transaction.savepoint(using=connection.alias)
-                cursor.execute('SELECT \'{}\'::json = \'{}\'::json;')
-            except DatabaseError:
-                transaction.savepoint_rollback(sid, using=connection.alias)
-                db_type = 'text'
-            else:
-                db_type = 'json'
-            cache.set(cache_key, db_type)
-        
-        return db_type
+        return db_type(connection)
     
     def to_python(self, value):
         if isinstance(value, six.string_types):
@@ -112,7 +89,18 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             return None
         return json.dumps(value, default=default, **self.encoder_kwargs)
     
+    def _get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+        if db_type(connection) != 'jsonb':
+            if lookup_type == 'has_key':
+                return '%%"%s"%%' % value
+                raise TypeError('Lookup __has_key not supported with your database.')
+        
+        return super(JSONField, self).get_db_prep_lookup(lookup_type, value, connection, prepared)
+        
     def get_prep_lookup(self, lookup_type, value):
+        # Some of these may depend upon self.db_type(), which we don't know
+        # just yet.
+        
         if lookup_type in ["exact", "iexact"]:
             return self.to_python(self.get_prep_value(value))
         if lookup_type == "in":
@@ -121,7 +109,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             return value
         if lookup_type in ["contains", "icontains"]:
             if isinstance(value, (list, tuple)):
-                raise TypeError("Lookup type %r not supported with argument of %s" % (
+                raise TypeError("Lookup type __%r not supported with argument of %s" % (
                     lookup_type, type(value).__name__
                 ))
                 # Need a way co combine the values with '%', but don't escape that.
@@ -130,7 +118,6 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
                 return self.get_prep_value(value)[1:-1]
             return self.to_python(self.get_prep_value(value))
         # raise TypeError('Lookup type %r not supported' % lookup_type)
-        print value
         return value
 
     def value_to_string(self, obj):
