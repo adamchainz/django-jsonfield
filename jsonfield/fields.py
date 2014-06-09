@@ -89,37 +89,30 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             return None
         return json.dumps(value, default=default, **self.encoder_kwargs)
     
-    def _get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
         if db_type(connection) != 'jsonb':
-            if lookup_type == 'has_key':
-                return '%%"%s"%%' % value
-                raise TypeError('Lookup __has_key not supported with your database.')
+            if lookup_type in ["exact", "iexact"]:
+                return [self.to_python(self.get_prep_value(value))]
+            if lookup_type == "in":
+                return [[self.to_python(self.get_prep_value(v)) for v in value]]
+            if lookup_type == "isnull":
+                return [value]
+            if lookup_type in ['contains', 'icontains']:
+                if isinstance(value, dict):
+                    return [self.get_prep_value(value)[1:-1]]
+            
+            return [value]
+        
+        if lookup_type in ['contains', 'icontains']:
+            # If we got a dict, then we want to use contains,
+            # otherwise we want to actually use has_key.
+            if isinstance(value, dict):
+                return [self.get_prep_value(value)]
+            
+            raise ValueError('In your database, you must use __has_key to see if a key exists in an object.')
         
         return super(JSONField, self).get_db_prep_lookup(lookup_type, value, connection, prepared)
-        
-    def get_prep_lookup(self, lookup_type, value):
-        # Some of these may depend upon self.db_type(), which we don't know
-        # just yet.
-        
-        if lookup_type in ["exact", "iexact"]:
-            return self.to_python(self.get_prep_value(value))
-        if lookup_type == "in":
-            return [self.to_python(self.get_prep_value(v)) for v in value]
-        if lookup_type == "isnull":
-            return value
-        if lookup_type in ["contains", "icontains"]:
-            if isinstance(value, (list, tuple)):
-                raise TypeError("Lookup type __%r not supported with argument of %s" % (
-                    lookup_type, type(value).__name__
-                ))
-                # Need a way co combine the values with '%', but don't escape that.
-                return self.get_prep_value(value)[1:-1].replace(', ', r'%')
-            if isinstance(value, dict):
-                return self.get_prep_value(value)[1:-1]
-            return self.to_python(self.get_prep_value(value))
-        # raise TypeError('Lookup type %r not supported' % lookup_type)
-        return value
-
+    
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj)
 
@@ -168,5 +161,7 @@ except ImportError:
     pass
 
 if hasattr(JSONField, 'register_lookup'):
-    from .lookups import HasKey
-    models.Field.register_lookup(HasKey)
+    from .lookups import HasKey, Contains, Exact
+    JSONField.register_lookup(HasKey)
+    JSONField.register_lookup(Contains)
+    JSONField.register_lookup(Exact)
