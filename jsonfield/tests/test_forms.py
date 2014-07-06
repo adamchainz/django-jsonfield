@@ -8,26 +8,26 @@ from jsonfield.tests.jsonfield_test_app.forms import JSONTestForm, JSONTestModel
 class JSONFormFieldTest(DjangoTestCase):
     def test_form_field_clean_empty_object(self):
         field = JSONFormField(required=False)
-        self.assertEquals({}, field.clean('{}'))
+        self.assertEqual({}, field.clean('{}'))
         
     def test_form_field_clean_object(self):
         field = JSONFormField(required=False)
-        self.assertEquals(
+        self.assertEqual(
             {'foo':'bar', 'baz':2},
             field.clean('{"foo":"bar","baz":2}')
         )
     
     def test_form_field_clean_empty_array(self):
         field = JSONFormField(required=False)
-        self.assertEquals([],field.clean('[]'))
+        self.assertEqual([],field.clean('[]'))
     
     def test_required_form_field_array(self):
         field = JSONFormField(required=True)
-        self.assertEquals([], field.clean('[]'))
+        self.assertEqual([], field.clean('[]'))
         
     def test_required_form_field_object(self):
         field = JSONFormField(required=True)
-        self.assertEquals({}, field.clean('{}'))
+        self.assertEqual({}, field.clean('{}'))
     
     def test_required_form_field_empty(self):
         field = JSONFormField(required=True)
@@ -51,6 +51,6 @@ class JSONFormMultipleSelectFieldTest(DjangoTestCase):
         form = JSONTestForm({'json_data': ['SA', 'WA']})
         assert form.is_valid()
         
-        self.assertEquals(['SA', 'WA'], form.cleaned_data['json_data'])
+        self.assertEqual(['SA', 'WA'], form.cleaned_data['json_data'])
 
 
