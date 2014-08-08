@@ -16,7 +16,14 @@ class JSONFormFieldTest(DjangoTestCase):
             {'foo':'bar', 'baz':2},
             field.clean('{"foo":"bar","baz":2}')
         )
-    
+
+    def test_form_field_widget(self):
+        field = JSONFormField(required=False)
+        self.assertIn(
+            '{\n  &quot;a&quot;: true\n}',
+            field.widget.render('json', {"a": True})
+        )
+
     def test_form_field_clean_empty_array(self):
         field = JSONFormField(required=False)
         self.assertEqual([],field.clean('[]'))
