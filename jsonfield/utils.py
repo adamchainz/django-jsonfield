@@ -3,11 +3,13 @@ from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
 
+
 class TZAwareJSONEncoder(DjangoJSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.strftime("%Y-%m-%d %H:%M:%S%z")
         return super(TZAwareJSONEncoder, self).default(obj)
+
 
 def default(o):
     if hasattr(o, 'to_json'):
@@ -24,5 +26,5 @@ def default(o):
         if o.tzinfo:
             return o.strftime('%H:%M:%S%z')
         return o.strftime("%H:%M:%S")
-    
+
     raise TypeError(repr(o) + " is not JSON serializable")

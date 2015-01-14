@@ -1,10 +1,10 @@
-import json 
+import json
 
 from django import forms
-from django.conf import settings
 from django.utils import six
 
 from .utils import default
+
 
 class JSONWidget(forms.Textarea):
     def render(self, name, value, attrs=None):
