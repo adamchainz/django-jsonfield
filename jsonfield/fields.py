@@ -21,6 +21,7 @@ DB_TYPE_CACHE_KEY = (
     '%(ENGINE)s:%(HOST)s:%(PORT)s:%(NAME)s'
 )
 
+
 class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     A field that will ensure the data entered into it is valid JSON.
@@ -52,7 +53,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             raise ValidationError(self.error_messages['null'])
         try:
             self.get_prep_value(value)
-        except:
+        except ValueError:
             raise ValidationError(self.error_messages['invalid'] % value)
 
     def get_default(self):
@@ -86,7 +87,6 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
                     db_type = 'text'
                 else:
                     db_type = 'jsonb'
-
             else:
                 # If we are on MySQL, we want to use longtext.
                 db_type = 'longtext'
@@ -141,6 +141,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
 
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj)
+
 
 class TypedJSONField(JSONField):
     """

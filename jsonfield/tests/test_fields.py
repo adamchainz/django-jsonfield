@@ -1,18 +1,18 @@
 #:coding=utf-8:
 from django.test import TestCase as DjangoTestCase
-from django.utils import unittest
 from django.utils.encoding import force_text
 from django import forms
 
-from jsonfield.tests.jsonfield_test_app.models import *
+from jsonfield.tests.jsonfield_test_app.models import *  # NOQA
 from jsonfield.fields import JSONField
+
 
 class JSONFieldTest(DjangoTestCase):
     def test_json_field(self):
         obj = JSONFieldTestModel(json='''{
             "spam": "eggs"
         }''')
-        self.assertEqual(obj.json, {'spam':'eggs'})
+        self.assertEqual(obj.json, {'spam': 'eggs'})
 
     def test_json_field_empty(self):
         obj = JSONFieldTestModel(json='')
@@ -26,7 +26,7 @@ class JSONFieldTest(DjangoTestCase):
             }''',
         )
         obj2 = JSONFieldTestModel.objects.get(id=10)
-        self.assertEqual(obj2.json, {'spam':'eggs'})
+        self.assertEqual(obj2.json, {'spam': 'eggs'})
 
     def test_json_field_save_empty(self):
         JSONFieldTestModel.objects.create(id=10, json='')
@@ -87,24 +87,24 @@ class JSONFieldTest(DjangoTestCase):
 
     def test_query_object(self):
         JSONFieldTestModel.objects.create(json={})
-        JSONFieldTestModel.objects.create(json={'foo':'bar'})
+        JSONFieldTestModel.objects.create(json={'foo': 'bar'})
         self.assertEqual(2, JSONFieldTestModel.objects.all().count())
         self.assertEqual(1, JSONFieldTestModel.objects.exclude(json={}).count())
         self.assertEqual(1, JSONFieldTestModel.objects.filter(json={}).count())
-        self.assertEqual(1, JSONFieldTestModel.objects.filter(json={'foo':'bar'}).count())
-        self.assertEqual(1, JSONFieldTestModel.objects.filter(json__contains={'foo':'bar'}).count())
-        JSONFieldTestModel.objects.create(json={'foo':'bar', 'baz':'bing'})
-        self.assertEqual(2, JSONFieldTestModel.objects.filter(json__contains={'foo':'bar'}).count())
+        self.assertEqual(1, JSONFieldTestModel.objects.filter(json={'foo': 'bar'}).count())
+        self.assertEqual(1, JSONFieldTestModel.objects.filter(json__contains={'foo': 'bar'}).count())
+        JSONFieldTestModel.objects.create(json={'foo': 'bar', 'baz': 'bing'})
+        self.assertEqual(2, JSONFieldTestModel.objects.filter(json__contains={'foo': 'bar'}).count())
         # This next one is a bit hard to do without proper lookups, which I'm unlikely to implement.
-        #self.assertEqual(1, JSONFieldTestModel.objects.filter(json__contains={'baz':'bing', 'foo':'bar'}).count())
+        # self.assertEqual(1, JSONFieldTestModel.objects.filter(json__contains={'baz':'bing', 'foo':'bar'}).count())
         self.assertEqual(2, JSONFieldTestModel.objects.filter(json__contains='foo').count())
         # This code needs to be implemented!
-        self.assertRaises(TypeError, lambda:JSONFieldTestModel.objects.filter(json__contains=['baz', 'foo']))
+        self.assertRaises(TypeError, lambda: JSONFieldTestModel.objects.filter(json__contains=['baz', 'foo']))
 
     def test_query_isnull(self):
         JSONFieldTestModel.objects.create(json=None)
         JSONFieldTestModel.objects.create(json={})
-        JSONFieldTestModel.objects.create(json={'foo':'bar'})
+        JSONFieldTestModel.objects.create(json={'foo': 'bar'})
 
         self.assertEqual(1, JSONFieldTestModel.objects.filter(json=None).count())
         self.assertEqual(None, JSONFieldTestModel.objects.get(json=None).json)
@@ -122,12 +122,12 @@ class JSONFieldTest(DjangoTestCase):
     def test_callable_default(self):
         CallableDefaultModel.objects.create()
         obj = CallableDefaultModel.objects.get()
-        self.assertEqual({'x':2}, obj.json)
+        self.assertEqual({'x': 2}, obj.json)
 
     def test_callable_default_overridden(self):
-        CallableDefaultModel.objects.create(json={'x':3})
+        CallableDefaultModel.objects.create(json={'x': 3})
         obj = CallableDefaultModel.objects.get()
-        self.assertEqual({'x':3}, obj.json)
+        self.assertEqual({'x': 3}, obj.json)
 
     def test_mutable_default_checking(self):
         obj1 = JSONFieldWithDefaultTestModel()
@@ -145,10 +145,11 @@ class JSONFieldTest(DjangoTestCase):
 
     def test_invalid_json_default(self):
         with self.assertRaises(ValueError):
-            field = JSONField('test', default='{"foo"}')
+            JSONField('test', default='{"foo"}')
 
     def test_indent(self):
-        field = JSONField('test', indent=2)
+        JSONField('test', indent=2)
+
 
 class SavingModelsTest(DjangoTestCase):
     def test_saving_null(self):

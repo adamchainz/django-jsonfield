@@ -6,6 +6,7 @@ from jsonfield.utils import TZAwareJSONEncoder
 
 register = template.Library()
 
+
 @register.filter
 def jsonify(value):
     # If we have a queryset, then convert it into a list.

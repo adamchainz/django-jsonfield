@@ -8,7 +8,7 @@ from .widgets import JSONWidget
 
 class JSONFormField(forms.CharField):
     empty_values = [None, '']
-    
+
     def __init__(self, *args, **kwargs):
         if 'widget' not in kwargs:
             kwargs['widget'] = JSONWidget
@@ -24,7 +24,7 @@ class JSONFormField(forms.CharField):
                 )
         else:
             return value
-    
+
     def validate(self, value):
         # This is required in older django versions.
         if value in self.empty_values and self.required:
