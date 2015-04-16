@@ -23,6 +23,8 @@ def main():
         'default': {
             'ENGINE': 'django.db.backends.{DB_ENGINE}'.format(**os.environ),
             'NAME': 'jsonfield-{DB_NAME}'.format(**os.environ),
+            'USER': os.environ.get('DB_USER', ''),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         }
     }
 
