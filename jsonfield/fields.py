@@ -70,30 +70,14 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return 'TextField'
 
     def db_type(self, connection):
-        cache_key = DB_TYPE_CACHE_KEY % connection.settings_dict
-        db_type = cache.get(cache_key)
-
-        if not db_type:
-            if connection.vendor == 'postgresql':
-                # Sniff _pg_version?
-                # Test to see if we support JSON querying.
-                # For now, just look to see if jsonb is available.
-                cursor = connection.cursor()
-                try:
-                    sid = transaction.savepoint(using=connection.alias)
-                    cursor.execute('SELECT \'{}\'::jsonb')
-                except DatabaseError:
-                    transaction.savepoint_rollback(sid, using=connection.alias)
-                    db_type = 'text'
-                else:
-                    db_type = 'jsonb'
-            else:
-                # If we are on MySQL, we want to use longtext.
-                db_type = 'longtext'
-
-            cache.set(cache_key, db_type)
-
-        return db_type
+        if connection.vendor == 'postgresql':
+            # Only do jsonb if in pg 9.4+
+            if connection.pg_version >= 90400:
+                return 'jsonb'
+            return 'text'
+        if connection.vendor == 'mysql':
+            return 'longtext'
+        return 'text'
 
     def to_python(self, value):
         if isinstance(value, six.string_types):
