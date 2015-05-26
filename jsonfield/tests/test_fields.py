@@ -150,6 +150,10 @@ class JSONFieldTest(DjangoTestCase):
     def test_indent(self):
         JSONField('test', indent=2)
 
+    def test_string_is_valid_json(self):
+        JSONFieldTestModel.objects.create(json='"foo"')
+        self.assertEqual('foo', JSONFieldTestModel.objects.get().json)
+
 
 class SavingModelsTest(DjangoTestCase):
     def test_saving_null(self):
