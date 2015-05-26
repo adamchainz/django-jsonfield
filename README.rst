@@ -17,10 +17,10 @@ To use, just install the package, and then use the field::
 
     from django.db import models
     import jsonfield
-    
+
     class MyModel(models.Model):
         the_json = jsonfield.JSONField()
-    
+
 Now, it will validate the JSON on entry, and store it as a string in the
 database.  When you instantiate/fetch the object, it will be turned back
 into a python list/dict/string.
@@ -44,13 +44,17 @@ jsonify templatetag
 This allows you to convert a python data structure into JSON within a template::
 
     {% load jsonify %}
-    
+
     <script>
     var foo = {{ bar|jsonify }};
     </script>
-  
+
 History
 ----------
+
+0.9.14
+~~~~~~
+No longer hit the db to work out db_type.
 
 0.9.12
 ~~~~~~
@@ -84,7 +88,7 @@ Remove support for django < 1.3.
 Add LICENSE file.
 Added TypedJSONField.
 
- 
+
 0.8.10
 ~~~~~~
 Allow ``{{ variable|jsonify }}`` to work with querysets.
@@ -148,7 +152,7 @@ Todo
 ----------
 Allow for passing in a function to use for processing unknown data types.
 
-Convert date/time objects nicely to/from ISO strings (YYYY-mm-dd HH:MM:SS 
+Convert date/time objects nicely to/from ISO strings (YYYY-mm-dd HH:MM:SS
 TZNAME). This is actually a bit tricky, as we don't know if we are expecting
 a date/time object. We may parse objects as we go, but there could be
 some performance issues with this. I'm tempted to say "only do this on TypedJSONField()"
