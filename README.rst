@@ -52,6 +52,10 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.9.15
+~~~~~~
+Bump version number to get around uploading issues.
+
 0.9.14
 ~~~~~~
 No longer hit the db to work out db_type.
