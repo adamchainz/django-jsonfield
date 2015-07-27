@@ -13,3 +13,4 @@ class JSONTestModelForm(forms.ModelForm):
 
     class Meta:
         model = JSONFieldTestModel
+        exclude = []
