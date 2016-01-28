@@ -77,6 +77,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             return 'text'
         if connection.vendor == 'mysql':
             return 'longtext'
+        if connection.vendor == 'oracle':
+            return 'long'
         return 'text'
 
     def to_python(self, value):
