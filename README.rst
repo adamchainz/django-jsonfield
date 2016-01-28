@@ -1,7 +1,7 @@
 django-jsonfield
 ===================
 
-.. image:: https://codeship.com/projects/2e1a3d30-7db7-0132-629f-4abd151a3721/status?branch=trunk
+.. image:: https://codeship.com/projects/2e1a3d30-7db7-0132-629f-4abd151a3721/status?branch=default
 
 I had a serious need for a JSON field for django. There were a couple out
 there, but none packaged up nicely on bitbucket/github that were usable
