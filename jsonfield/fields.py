@@ -11,7 +11,7 @@ from django.core.cache import cache
 from decimal import Decimal
 import datetime
 
-from .utils import default
+from .utils import default, _resolve_object_path
 from .widgets import JSONWidget
 from .forms import JSONFormField
 from jsonfield import __version__
@@ -35,8 +35,13 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         if not kwargs.get('null', False):
             kwargs['default'] = kwargs.get('default', dict)
         self.encoder_kwargs = {
-            'indent': kwargs.pop('indent', getattr(settings, 'JSONFIELD_INDENT', None))
+            'indent': kwargs.pop('indent', getattr(settings, 'JSONFIELD_INDENT', None)),
         }
+        # This can be an object (probably a class), or a path which can be imported, resulting
+        # in an object.
+        encoder_class = kwargs.pop('encoder_class', getattr(settings, 'JSONFIELD_ENCODER_CLASS', None))
+        if encoder_class:
+            self.encoder_kwargs['cls'] = _resolve_object_path(encoder_class)
         super(JSONField, self).__init__(*args, **kwargs)
         self.validate(self.get_default(), None)
 
