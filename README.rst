@@ -51,6 +51,14 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.9.16
+~~~~~~
+Allow passing an argument of `encoder_class` to a field, which will result in that object (or
+the object located at that path, for instance `core.utils.JSONEncoder`) being used as the `cls`
+argument when serializing objects.
+
+You may also set this as a global value in settings.JSONFIELD_ENCODER_CLASS
+
 0.9.15
 ~~~~~~
 Bump version number to get around uploading issues.
