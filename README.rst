@@ -51,6 +51,16 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
+0.9.17
+~~~~~~
+Allow passing `decoder_kwargs` as an argument to a field. This dict will be passed as kwargs to
+the `json.loads()` calls when loading data that is a string.
+
+You may also set this as a global value in settings.JSONFIELD_DECODER_KWARGS.
+
+A new dict is created for each field: so if this value is altered after field definition, it shouldn't
+affect already attached fields.
+
 0.9.16
 ~~~~~~
 Allow passing an argument of `encoder_class` to a field, which will result in that object (or
