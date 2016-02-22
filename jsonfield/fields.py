@@ -42,6 +42,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         encoder_class = kwargs.pop('encoder_class', getattr(settings, 'JSONFIELD_ENCODER_CLASS', None))
         if encoder_class:
             self.encoder_kwargs['cls'] = _resolve_object_path(encoder_class)
+
+        self.decoder_kwargs = dict(kwargs.pop('decoder_kwargs', getattr(settings, 'JSONFIELD_DECODER_KWARGS', {})))
         super(JSONField, self).__init__(*args, **kwargs)
         self.validate(self.get_default(), None)
 
@@ -67,8 +69,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             if callable(default):
                 default = default()
             if isinstance(default, six.string_types):
-                return json.loads(default)
-            return json.loads(json.dumps(default))
+                return json.loads(default, **self.decoder_kwargs)
+            return json.loads(json.dumps(default, **self.encoder_kwargs), **self.decoder_kwargs)
         return super(JSONField, self).get_default()
 
     def get_internal_type(self):
@@ -94,7 +96,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
                 if self.blank:
                     return ""
             try:
-                value = json.loads(value)
+                value = json.loads(value, **self.decoder_kwargs)
             except ValueError:
                 msg = self.error_messages['invalid'] % value
                 raise ValidationError(msg)
