@@ -51,7 +51,7 @@ This allows you to convert a python data structure into JSON within a template::
 History
 ----------
 
-0.9.18
+0.9.19
 ~~~~~~
 Allow passing `decoder_kwargs` as an argument to a field. This dict will be passed as kwargs to
 the `json.loads()` calls when loading data that is a string.
