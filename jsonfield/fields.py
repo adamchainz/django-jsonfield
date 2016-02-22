@@ -111,7 +111,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             if not self.null and self.blank:
                 return ""
             return None
-        return json.dumps(value, default=default, **self.encoder_kwargs)
+        return json.dumps(value, **self.encoder_kwargs)
 
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type in ["exact", "iexact"]:
