@@ -39,6 +39,9 @@ Supported django versions
 
 All versions of Django from 1.4 onwards are tested, however, if you are using Postgres, I highly recommend that you consider using the ``django.contrib.postgres`` module's ``JSONField`` instead.
 
+Starting with Django 1.8, ``JSONField`` no longer decodes assigned string values as JSON. Instead it assumes that any value that you assign is the decoded value which will be JSON-encoded before storage in the database.
+
+
 Extras
 ------
 

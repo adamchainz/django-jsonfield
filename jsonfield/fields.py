@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
+import functools
 import json
 
+import django
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import models
@@ -11,8 +13,17 @@ from .utils import _resolve_object_path
 from .widgets import JSONWidget
 from .forms import JSONFormField
 
+# Handle deprecation of SubfieldBase
+if django.VERSION[:2] < (1, 8):
+    from django.db.models import SubfieldBase
+    field_class = functools.partial(six.with_metaclass, SubfieldBase)
+    opportunistic_decode = True
+else:
+    field_class = functools.partial(six.with_metaclass, type)
+    opportunistic_decode = False
 
-class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
+
+class JSONField(field_class(models.Field)):
     """
     A field that will ensure the data entered into it is valid JSON.
     """
@@ -78,18 +89,17 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
             return 'long'
         return 'text'
 
+    def from_db_value(self, value, expression, connection, context):
+        if value is None:
+            return None
+        return json.loads(value, **self.decoder_kwargs)
+
     def to_python(self, value):
-        if isinstance(value, six.string_types):
-            if value == "":
-                if self.null:
-                    return None
-                if self.blank:
-                    return ""
+        if opportunistic_decode and isinstance(value, six.string_types):
             try:
                 value = json.loads(value, **self.decoder_kwargs)
             except ValueError:
-                msg = self.error_messages['invalid'] % value
-                raise ValidationError(msg)
+                pass
         # TODO: Look for date/time/datetime objects within the structure?
         return value
 
@@ -104,11 +114,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return json.dumps(value, **self.encoder_kwargs)
 
     def get_prep_lookup(self, lookup_type, value):
-        if lookup_type in ["exact", "iexact"]:
-            return self.to_python(self.get_prep_value(value))
-        if lookup_type == "in":
-            return [self.to_python(self.get_prep_value(v)) for v in value]
-        if lookup_type == "isnull":
+        if lookup_type in ["exact", "iexact", "in", "isnull"]:
             return value
         if lookup_type in ["contains", "icontains"]:
             if isinstance(value, (list, tuple)):
@@ -119,7 +125,7 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):
                 return self.get_prep_value(value)[1:-1].replace(', ', r'%')
             if isinstance(value, dict):
                 return self.get_prep_value(value)[1:-1]
-            return self.to_python(self.get_prep_value(value))
+            return self.get_prep_value(value)
         raise TypeError('Lookup type %r not supported' % lookup_type)
 
     def value_to_string(self, obj):
