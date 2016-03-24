@@ -14,5 +14,5 @@ build
 dist
 .test
 .tox
-.coverage
+.coverage*
 htmlcov
