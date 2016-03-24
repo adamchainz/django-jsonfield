@@ -33,7 +33,11 @@ Notes
 If no ``default`` is provided, and ``null=True`` is not passed in to the
 field constructor, then a default of ``{}`` will be used.
 
-There are also a couple of other bits and bobs:
+
+Supported django versions
+-------------------------
+
+All versions of Django from 1.4 onwards are tested, however, if you are using Postgres, I highly recommend that you consider using the ``django.contrib.postgres`` module's ``JSONField`` instead.
 
 Extras
 ------
