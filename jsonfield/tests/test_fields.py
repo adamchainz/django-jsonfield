@@ -1,4 +1,3 @@
-#:coding=utf-8:
 import unittest
 
 from django.test import TestCase as DjangoTestCase
@@ -53,12 +52,20 @@ class JSONFieldTest(DjangoTestCase):
     def test_formfield_clean_blank(self):
         field = JSONField("test")
         formfield = field.formfield()
-        self.assertRaisesMessage(forms.ValidationError, force_text(formfield.error_messages['required']), formfield.clean, value='')
+        self.assertRaisesMessage(
+            forms.ValidationError,
+            force_text(formfield.error_messages['required']),
+            formfield.clean,
+            value='')
 
     def test_formfield_clean_none(self):
         field = JSONField("test")
         formfield = field.formfield()
-        self.assertRaisesMessage(forms.ValidationError, force_text(formfield.error_messages['required']), formfield.clean, value=None)
+        self.assertRaisesMessage(
+            forms.ValidationError,
+            force_text(formfield.error_messages['required']),
+            formfield.clean,
+            value=None)
 
     def test_formfield_null_and_blank_clean_blank(self):
         field = JSONField("test", null=True, blank=True)

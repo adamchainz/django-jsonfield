@@ -3,23 +3,13 @@ import json
 
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from django.db import models, DatabaseError, transaction
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
-from django.core.cache import cache
 
-from decimal import Decimal
-import datetime
-
-from .utils import default, _resolve_object_path
+from .utils import _resolve_object_path
 from .widgets import JSONWidget
 from .forms import JSONFormField
-from jsonfield import __version__
-
-DB_TYPE_CACHE_KEY = (
-    'django-jsonfield:db-type:%s' % __version__ +
-    '%(ENGINE)s:%(HOST)s:%(PORT)s:%(NAME)s'
-)
 
 
 class JSONField(six.with_metaclass(models.SubfieldBase, models.Field)):

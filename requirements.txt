@@ -1,3 +1,4 @@
-tox>=1.8.1
+hg+https://bitbucket.org/schinckel/tox@hook/report-status#egg=tox
+hg+https://bitbucket.org/schinckel/tox-bitbucket-status#egg=tox-bitbucket-status
 coverage
 detox
