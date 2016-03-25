@@ -20,9 +20,10 @@ To use, just install the package, and then use the field::
     class MyModel(models.Model):
         the_json = jsonfield.JSONField()
 
-Now, it will validate the JSON on entry, and store it as a string in the
-database.  When you instantiate/fetch the object, it will be turned back
-into a python list/dict/string.
+You can assign any JSON-encodable object to this field. It will be
+JSON-encoded before being stored in the database as a text value and it
+will be turned back into a python list/dict/string upon retrieval from the
+database.
 
 There is also a ``TypedJSONField``, that allows you to define data types that must be included within each object in the array. More documentation to follow.
 
@@ -37,10 +38,7 @@ field constructor, then a default of ``{}`` will be used.
 Supported django versions
 -------------------------
 
-All versions of Django from 1.4 onwards are tested, however, if you are using Postgres, I highly recommend that you consider using the ``django.contrib.postgres`` module's ``JSONField`` instead.
-
-Starting with Django 1.8, ``JSONField`` no longer decodes assigned string values as JSON. Instead it assumes that any value that you assign is the decoded value which will be JSON-encoded before storage in the database.
-
+All versions of Django from 1.8 onwards are tested, however, if you are using Postgres, I highly recommend that you consider using the ``django.contrib.postgres`` module's ``JSONField`` instead.
 
 Extras
 ------
@@ -57,6 +55,14 @@ This allows you to convert a python data structure into JSON within a template::
 
 History
 ----------
+
+1.0.0
+~~~~~
+
+Add support for Django 1.8 and 1.9 (without warnings). Remove support for Django < 1.8
+as none of those releases are supported upstream anyway.
+
+With this version, ``JSONField`` no longer decodes assigned string values as JSON. Instead it assumes that any value that you assign is the decoded value which will be JSON-encoded before storage in the database. This explains the bump to version 1.0 as it's a backwards incompatible change.
 
 0.9.19
 ~~~~~~

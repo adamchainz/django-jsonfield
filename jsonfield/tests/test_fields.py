@@ -1,6 +1,3 @@
-import unittest
-
-import django
 from django.test import TestCase as DjangoTestCase
 from django.utils.encoding import force_text
 from django import forms
@@ -22,11 +19,6 @@ class JSONFieldTest(DjangoTestCase):
         obj = JSONFieldTestModel(json=None)
         self.assertEqual(obj.json, None)
 
-    @unittest.skipUnless(django.VERSION[0:2] < (1, 8), "Django < 1.8")
-    def test_json_field_opportunistic_decode(self):
-        obj = JSONFieldTestModel(json="""{"spam": "eggs"}""")
-        self.assertEqual(obj.json, {'spam': 'eggs'})
-
     def test_json_field_save(self):
         JSONFieldTestModel.objects.create(
             id=10,
@@ -44,15 +36,6 @@ class JSONFieldTest(DjangoTestCase):
         JSONFieldTestModel.objects.create(id=10, json=None)
         obj2 = JSONFieldTestModel.objects.get(id=10)
         self.assertEqual(obj2.json, None)
-
-    @unittest.skipUnless(django.VERSION[0:2] < (1, 8), "Django < 1.8")
-    def test_json_field_save_opportunistic_decode(self):
-        JSONFieldTestModel.objects.create(
-            id=10,
-            json="""{"spam": "eggs"}"""
-        )
-        obj2 = JSONFieldTestModel.objects.get(id=10)
-        self.assertEqual(obj2.json, {'spam': 'eggs'})
 
     def test_db_prep_save(self):
         field = JSONField("test")
@@ -165,16 +148,12 @@ class JSONFieldTest(DjangoTestCase):
         obj1.json['foo'] = 'bar'
         self.assertNotIn('foo', obj2.json)
 
-    def test_invalid_json(self):
-        obj = JSONFieldTestModel(json='{"spam"}')
-        self.assertEqual(obj.json, '{"spam"}')
-
     def test_indent(self):
         JSONField('test', indent=2)
 
-    def test_string_is_valid_json(self):
-        JSONFieldTestModel.objects.create(json='foo')
-        self.assertEqual('foo', JSONFieldTestModel.objects.get().json)
+    def test_string_is_not_json_decoded(self):
+        JSONFieldTestModel.objects.create(json='"foo"')
+        self.assertEqual('"foo"', JSONFieldTestModel.objects.get().json)
 
 
 class SavingModelsTest(DjangoTestCase):
