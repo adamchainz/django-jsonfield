@@ -1,8 +1,6 @@
 from __future__ import unicode_literals
-import functools
 import json
 
-import django
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import models
@@ -13,17 +11,8 @@ from .utils import _resolve_object_path
 from .widgets import JSONWidget
 from .forms import JSONFormField
 
-# Handle deprecation of SubfieldBase
-if django.VERSION[:2] < (1, 8):
-    from django.db.models import SubfieldBase
-    field_class = functools.partial(six.with_metaclass, SubfieldBase)
-    opportunistic_decode = True
-else:
-    field_class = functools.partial(six.with_metaclass, type)
-    opportunistic_decode = False
 
-
-class JSONField(field_class(models.Field)):
+class JSONField(models.Field):
     """
     A field that will ensure the data entered into it is valid JSON.
     """
@@ -94,14 +83,6 @@ class JSONField(field_class(models.Field)):
             return None
         return json.loads(value, **self.decoder_kwargs)
 
-    def to_python(self, value):
-        if opportunistic_decode and isinstance(value, six.string_types):
-            try:
-                value = json.loads(value, **self.decoder_kwargs)
-            except ValueError:
-                pass
-        # TODO: Look for date/time/datetime objects within the structure?
-        return value
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
         return self.get_prep_value(value)
@@ -169,9 +150,3 @@ class TypedJSONField(JSONField):
             else:
                 v(value)
 
-try:
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ['^jsonfield\.fields\.JSONField'])
-    add_introspection_rules([], ['^jsonfield\.fields\.TypedJSONField'])
-except ImportError:
-    pass
