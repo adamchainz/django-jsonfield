@@ -67,6 +67,12 @@ stored in the converted data structure.
 History
 ----------
 
+1.0.1
+~~~~~~
+Fix issue with Postgres JSONB fields.
+Limit XSS attacks with jsonify template tag.
+
+
 1.0.0
 ~~~~~
 
