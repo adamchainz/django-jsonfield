@@ -50,8 +50,19 @@ This allows you to convert a python data structure into JSON within a template::
     {% load jsonify %}
 
     <script>
-    var foo = {{ bar|jsonify }};
+    var foo = {{ bar|jsonify|safe }};
     </script>
+
+Note that you must only use the "safe" filter when you use the jsonify
+filter within a <script> tag (which is parsed like a CDATA section).
+
+If you use it in some other places like in an HTML attribute, then
+you must not use the safe filter so that its output is properly escaped::
+
+    <div data-foo="{{ bar|jsonify }}">
+
+The above rules are important to avoid XSS attacks with unsafe strings
+stored in the converted data structure.
 
 History
 ----------
