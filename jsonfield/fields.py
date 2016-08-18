@@ -4,6 +4,7 @@ import json
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import models
+from django.db.models.lookups import Exact, IExact, In, Contains, IContains
 from django.db.backends.signals import connection_created
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
@@ -95,23 +96,51 @@ class JSONField(models.Field):
             return None
         return json.dumps(value, **self.encoder_kwargs)
 
-    def get_prep_lookup(self, lookup_type, value):
-        if lookup_type in ["exact", "iexact", "in", "isnull"]:
-            return value
-        if lookup_type in ["contains", "icontains"]:
-            if isinstance(value, (list, tuple)):
-                raise TypeError("Lookup type %r not supported with argument of %s" % (
-                    lookup_type, type(value).__name__
-                ))
-                # Need a way co combine the values with '%', but don't escape that.
-                return self.get_prep_value(value)[1:-1].replace(', ', r'%')
-            if isinstance(value, dict):
-                return self.get_prep_value(value)[1:-1]
-            return self.get_prep_value(value)
-        raise TypeError('Lookup type %r not supported' % lookup_type)
-
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj)
+
+
+class NoPrepareMixin(object):
+    def get_prep_lookup(self):
+        return self.rhs
+
+
+class JSONFieldExactLookup(NoPrepareMixin, Exact):
+    pass
+
+
+class JSONFieldIExactLookup(NoPrepareMixin, IExact):
+    pass
+
+
+class JSONFieldInLookup(NoPrepareMixin, In):
+    pass
+
+
+class ContainsLookupMixin(object):
+    def get_prep_lookup(self):
+        if isinstance(self.rhs, (list, tuple)):
+            raise TypeError("Lookup type %r not supported with %s argument" % (
+                self.lookup_name, type(self.rhs).__name__
+            ))
+        if isinstance(self.rhs, dict):
+            return self.lhs.output_field.get_prep_value(self.rhs)[1:-1]
+        return self.lhs.output_field.get_prep_value(self.rhs)
+
+
+class JSONFieldContainsLookup(ContainsLookupMixin, Contains):
+    pass
+
+
+class JSONFieldIContainsLookup(ContainsLookupMixin, IContains):
+    pass
+
+
+JSONField.register_lookup(JSONFieldExactLookup)
+JSONField.register_lookup(JSONFieldIExactLookup)
+JSONField.register_lookup(JSONFieldInLookup)
+JSONField.register_lookup(JSONFieldContainsLookup)
+JSONField.register_lookup(JSONFieldIContainsLookup)
 
 
 class TypedJSONField(JSONField):
