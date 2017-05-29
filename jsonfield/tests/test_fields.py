@@ -1,3 +1,4 @@
+from django.core import serializers
 from django.test import TestCase as DjangoTestCase
 from django.utils.encoding import force_text
 from django import forms
@@ -154,6 +155,12 @@ class JSONFieldTest(DjangoTestCase):
     def test_string_is_not_json_decoded(self):
         JSONFieldTestModel.objects.create(json='"foo"')
         self.assertEqual('"foo"', JSONFieldTestModel.objects.get().json)
+
+    def test_serializing(self):
+        JSONFieldTestModel.objects.create(json='["foo"]')
+        serialized = serializers.serialize("json",
+                                           JSONFieldTestModel.objects.all())
+        self.assertIn('"json": "[\\"foo\\"]"', serialized)
 
 
 class SavingModelsTest(DjangoTestCase):
