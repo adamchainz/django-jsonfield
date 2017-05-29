@@ -64,6 +64,17 @@ you must not use the safe filter so that its output is properly escaped::
 The above rules are important to avoid XSS attacks with unsafe strings
 stored in the converted data structure.
 
+Contributing
+------------
+
+If you want to contribute to django-jsonfield, it will help you to run
+the test suite. This can be done in its most simple form by running::
+
+  DB_ENGINE=sqlite3 DB_NAME=tests ./tests.py
+
+To run the tests fully, you will need to install tox.
+
+
 History
 ----------
 
