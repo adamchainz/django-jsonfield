@@ -1,6 +1,14 @@
 django-jsonfield
 ===================
 
+Note that Django has a JSONField in django.contrib.postgres. You should probably be using that,
+instead of this. I am. If you still need to use this, and it doesn't work the way you think it
+should, then feel free to submit a PR. If it passes tests, I'll try to merge it.
+
+However, this project is used by some other projects, and I'm cautious about merging stuff that
+may break them. That has happened in the past...
+
+
 .. image:: https://codeship.com/projects/2e1a3d30-7db7-0132-629f-4abd151a3721/status?branch=default
 
 I had a serious need for a JSON field for django. There were a couple out
