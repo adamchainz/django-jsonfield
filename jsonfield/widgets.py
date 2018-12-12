@@ -1,5 +1,6 @@
 import json
 
+import django
 from django import forms
 from django.utils import six
 
@@ -13,6 +14,9 @@ class JSONWidget(forms.Textarea):
         if not isinstance(value, six.string_types):
             value = json.dumps(value, ensure_ascii=False, indent=2,
                                default=default)
+        if django.VERSION < (2, 0):
+            return super(JSONWidget, self).render(name, value, attrs)
+
         return super(JSONWidget, self).render(name, value, attrs, renderer)
 
 
