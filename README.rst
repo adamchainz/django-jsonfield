@@ -135,22 +135,31 @@ To run the tests fully, you will need to install tox.
 History
 -------
 
-1.0.1
-~~~~~~
+1.1.0 (2019-03-16)
+~~~~~~~~~~~~~~~~~~
+
+Django 1.10 support: register explicit lookup operators.
+
+Django 1.11 support: update render() method for widget.
+
+1.0.1 (2016-07-21)
+~~~~~~~~~~~~~~~~~~
+
 Fix issue with Postgres JSONB fields.
+
 Limit XSS attacks with jsonify template tag.
 
-
-1.0.0
-~~~~~
+1.0.0 (2016-06-02)
+~~~~~~~~~~~~~~~~~~
 
 Add support for Django 1.8 and 1.9 (without warnings). Remove support for Django < 1.8
 as none of those releases are supported upstream anyway.
 
 With this version, ``JSONField`` no longer decodes assigned string values as JSON. Instead it assumes that any value that you assign is the decoded value which will be JSON-encoded before storage in the database. This explains the bump to version 1.0 as it's a backwards incompatible change.
 
-0.9.19
-~~~~~~
+0.9.19 (2016-02-22)
+~~~~~~~~~~~~~~~~~~~
+
 Allow passing `decoder_kwargs` as an argument to a field. This dict will be passed as kwargs to
 the `json.loads()` calls when loading data that is a string.
 
