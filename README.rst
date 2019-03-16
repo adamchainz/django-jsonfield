@@ -1,26 +1,76 @@
 django-jsonfield
-===================
+================
 
-Note that Django has a JSONField in django.contrib.postgres. You should probably be using that,
-instead of this. I am. If you still need to use this, and it doesn't work the way you think it
-should, then feel free to submit a PR. If it passes tests, I'll try to merge it.
+----
 
-However, this project is used by some other projects, and I'm cautious about merging stuff that
-may break them. That has happened in the past...
+**Maintenance mode only:** It is not recommended you use this library on new
+projects. See the (long) **History** section below for why and alternatives.
+
+----
+
+Cross-database JSON field for Django models.
+
+History
+-------
 
 
-.. image:: https://codeship.com/projects/2e1a3d30-7db7-0132-629f-4abd151a3721/status?branch=default
+This project was created in 2010 by Matthew Schinckel. He created it based upon
+code from `David Cramer's
+blog <https://web.archive.org/web/20140731084522/http://cramer.io/2009/04/14/cleaning-up-with-json-and-sql/>`_,
+had the repository in Mercurial on
+`BitBucket <https://bitbucket.org/schinckel/django-jsonfield>`_, and
+maintained it until 2018. In March 2019, Adam Johnson took over maintenance
+(from an invite back in 2018!), and moved it to Git on
+`GitHub <https://github.com/adamchainz/django-jsonfield>`_ because he's no good
+at Mercurial and "everyone" uses GitHub these days.
 
-I had a serious need for a JSON field for django. There were a couple out
-there, but none packaged up nicely on bitbucket/github that were usable
-with ``pip install -e``.
+At the time it was created, the databases that Django supports didn't feature
+native JSON support. Since then, most of them have gained that ability.
+Correspondingly, there are some Django field implementations for taking
+advantage of this:
 
-So I took the code from `David Cramer's blog`_, and packaged it up.
+* A PostgreSQL ``JSONField`` is provided in
+  `django.contrib.postgres<https://docs.djangoproject.com/en/2.1/ref/contrib/postgres/fields/>`_,
+  which was created as part of Django in version 1.9, released December 2015.
+  Note this library interferes with the way that works, see
+  `issue 5<https://github.com/adamchainz/django-jsonfield/issues/5>`_ for
+  explanation and a workaround.
+* A MySQL (and maybe MariaDB) ``JSONField`` is provided in
+  `Django-MySQL <https://django-mysql.readthedocs.io/en/latest/model_fields/json_field.html>`_,
+  since version 1.0.7, released March 2016.
 
-Usage
------
+At time of writing this history (March 2019), there still isn't a JSONField
+implementation that can take advantage of the native features on all the
+databases. This has been discussed on the ``django-developers`` mailing list
+several times though.
 
-To use, just install the package, and then use the field::
+The ``JSONField`` provided by this library uses native features on
+PostgreSQL, but not on any other database, so it's in a bit of a weird place.
+
+If you are considering adding this to a new project, you probably don't want
+it, instead:
+
+* If you want native JSON support from your database and you're using
+  PostgreSQL or MySQL, use the native fields as per the links above.
+* If you don't want native JSON support, consider just storing the JSON in a
+  ``TextField`` and deserializing it appropriately in your code, perhaps with
+  a simple model property to proxy it.
+* If you need native JSON support on a database for which there is no Django
+  field implementation, try making it yourself or getting in touch to see if
+  there's something that can be done.
+
+Installation
+------------
+
+Install it with **pip**:
+
+.. code-block:: sh
+
+    pip install django-jsonfield
+
+Then use the field in your models:
+
+.. code-block:: python
 
     from django.db import models
     import jsonfield
@@ -33,8 +83,8 @@ JSON-encoded before being stored in the database as a text value and it
 will be turned back into a python list/dict/string upon retrieval from the
 database.
 
-There is also a ``TypedJSONField``, that allows you to define data types that must be included within each object in the array. More documentation to follow.
-
+There is also a ``TypedJSONField``, that allows you to define data types that
+must be included within each object in the array. More documentation to follow.
 
 Notes
 ~~~~~
@@ -42,11 +92,10 @@ Notes
 If no ``default`` is provided, and ``null=True`` is not passed in to the
 field constructor, then a default of ``{}`` will be used.
 
-
 Supported django versions
 -------------------------
 
-All versions of Django from 1.8 onwards are tested, however, if you are using Postgres, I highly recommend that you consider using the ``django.contrib.postgres`` module's ``JSONField`` instead.
+All versions of Django from 1.8 onwards are tested.
 
 Extras
 ------
@@ -84,7 +133,7 @@ To run the tests fully, you will need to install tox.
 
 
 History
-----------
+-------
 
 1.0.1
 ~~~~~~
@@ -197,7 +246,8 @@ Removed JSONTableWidget from package.
 
 0.8
 ~~~
-(Many thanks to `IanLewis`_ for these features)
+
+(Many thanks to `IanLewis <https://bitbucket.org/IanLewis>`_ for these features)
 
 Supports django 1.2
 
@@ -211,21 +261,9 @@ Removed JSONTableWidget from README.
 
 0.7.1
 ~~~~~
+
 Don't fail when trying to install before django is installed.
 
 0.7
 ~~~
-First time I tagged releases.
-
-
-Todo
-----------
-Allow for passing in a function to use for processing unknown data types.
-
-Convert date/time objects nicely to/from ISO strings (YYYY-mm-dd HH:MM:SS
-TZNAME). This is actually a bit tricky, as we don't know if we are expecting
-a date/time object. We may parse objects as we go, but there could be
-some performance issues with this. I'm tempted to say "only do this on TypedJSONField()"
-
-.. _David Cramer's blog: http://justcramer.com/2009/04/14/cleaning-up-with-json-and-sql/
-.. _IanLewis: https://bitbucket.org/IanLewis
+First tagged release.
