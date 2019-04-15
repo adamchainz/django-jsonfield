@@ -1,8 +1,6 @@
 django-jsonfield
 ================
 
-----
-
 **Maintenance mode only:** It is not recommended you use this library on new
 projects. See the (long) **History** section below for why and alternatives.
 
@@ -30,10 +28,10 @@ Correspondingly, there are some Django field implementations for taking
 advantage of this:
 
 * A PostgreSQL ``JSONField`` is provided in
-  `django.contrib.postgres<https://docs.djangoproject.com/en/2.1/ref/contrib/postgres/fields/>`_,
+  `django.contrib.postgres <https://docs.djangoproject.com/en/2.1/ref/contrib/postgres/fields/>`_,
   which was created as part of Django in version 1.9, released December 2015.
   Note this library interferes with the way that works, see
-  `issue 5<https://github.com/adamchainz/django-jsonfield/issues/5>`_ for
+  `issue 5 <https://github.com/adamchainz/django-jsonfield/issues/5>`_ for
   explanation and a workaround.
 * A MySQL (and maybe MariaDB) ``JSONField`` is provided in
   `Django-MySQL <https://django-mysql.readthedocs.io/en/latest/model_fields/json_field.html>`_,
