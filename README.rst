@@ -133,6 +133,13 @@ To run the tests fully, you will need to install tox.
 History
 -------
 
+Pending
+~~~~~~~
+
+* Tested with Django 2.2.
+* Stop "RemovedInDjango30Warning: Remove the context parameter from
+  JSONField.from_db_value()." on Django 2.0+.
+
 1.1.0 (2019-03-16)
 ~~~~~~~~~~~~~~~~~~
 
