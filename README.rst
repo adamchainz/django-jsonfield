@@ -133,8 +133,8 @@ To run the tests fully, you will need to install tox.
 History
 -------
 
-Pending
-~~~~~~~
+1.2.0 (2019-04-28)
+~~~~~~~~~~~~~~~~~~
 
 * Tested with Django 2.2.
 * Stop "RemovedInDjango30Warning: Remove the context parameter from
