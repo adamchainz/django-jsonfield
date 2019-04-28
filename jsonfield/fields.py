@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import json
 
+import django
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import models
@@ -80,11 +81,16 @@ class JSONField(models.Field):
             return 'long'
         return 'text'
 
-    def from_db_value(self, value, expression, connection, context):
-        if value is None:
-            return None
-        return json.loads(value, **self.decoder_kwargs)
-
+    if django.VERSION > (2, 0):
+        def from_db_value(self, value, expression, connection):
+            if value is None:
+                return None
+            return   json.loads(value, **self.decoder_kwargs)
+    else:
+        def from_db_value(self, value, expression, connection, context):
+            if value is None:
+                return None
+            return json.loads(value, **self.decoder_kwargs)
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
         return self.get_prep_value(value)
