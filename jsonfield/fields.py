@@ -38,7 +38,6 @@ class JSONField(models.Field):
 
         self.decoder_kwargs = dict(kwargs.pop('decoder_kwargs', getattr(settings, 'JSONFIELD_DECODER_KWARGS', {})))
         super(JSONField, self).__init__(*args, **kwargs)
-        self.validate(self.get_default(), None)
 
     def formfield(self, **kwargs):
         defaults = {
@@ -49,6 +48,7 @@ class JSONField(models.Field):
         return super(JSONField, self).formfield(**defaults)
 
     def validate(self, value, model_instance):
+        super(JSONField, self).validate(value, model_instance)
         if not self.null and value is None:
             raise ValidationError(self.error_messages['null'])
         try:
