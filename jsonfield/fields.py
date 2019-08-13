@@ -78,7 +78,7 @@ class JSONField(models.Field):
         if connection.vendor == 'mysql':
             return 'longtext'
         if connection.vendor == 'oracle':
-            return 'long'
+            return 'clob'
         return 'text'
 
     if django.VERSION > (2, 0):
