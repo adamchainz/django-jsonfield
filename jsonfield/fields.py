@@ -83,12 +83,12 @@ class JSONField(models.Field):
 
     if django.VERSION > (2, 0):
         def from_db_value(self, value, expression, connection):
-            if value is None:
+            if value is None or value == '':
                 return None
             return   json.loads(value, **self.decoder_kwargs)
     else:
         def from_db_value(self, value, expression, connection, context):
-            if value is None:
+            if value is None or value == '':
                 return None
             return json.loads(value, **self.decoder_kwargs)
 
