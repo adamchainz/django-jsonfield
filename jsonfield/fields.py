@@ -37,6 +37,7 @@ class JSONField(models.Field):
             self.encoder_kwargs['cls'] = _resolve_object_path(encoder_class)
 
         self.decoder_kwargs = dict(kwargs.pop('decoder_kwargs', getattr(settings, 'JSONFIELD_DECODER_KWARGS', {})))
+        self.custom_db_type = kwargs.pop('db_type', None)
         super(JSONField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
@@ -70,6 +71,8 @@ class JSONField(models.Field):
         return 'TextField'
 
     def db_type(self, connection):
+        if self.custom_db_type:
+            return self.custom_db_type
         if connection.vendor == 'postgresql':
             # Only do jsonb if in pg 9.4+
             if connection.pg_version >= 90400:
