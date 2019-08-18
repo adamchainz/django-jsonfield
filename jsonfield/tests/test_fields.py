@@ -1,3 +1,6 @@
+from unittest import skipUnless
+
+from django.db import connection
 from django.core import serializers
 from django.test import TestCase as DjangoTestCase
 from django.utils.encoding import force_text
@@ -161,6 +164,13 @@ class JSONFieldTest(DjangoTestCase):
         serialized = serializers.serialize("json",
                                            JSONFieldTestModel.objects.all())
         self.assertIn('"json": "[\\"foo\\"]"', serialized)
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL-specific test')
+    def test_work_parallel_with_postgres_json_field(self):
+        data = {'foo': 'bar'}
+        obj = PostgresParallelModel.objects.create(library_json=data, postgres_json=data)
+        obj = PostgresParallelModel.objects.get(id=obj.id)
+        self.assertEqual(obj.library_json, obj.postgres_json)
 
 
 class SavingModelsTest(DjangoTestCase):

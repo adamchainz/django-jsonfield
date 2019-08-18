@@ -85,11 +85,15 @@ class JSONField(models.Field):
         def from_db_value(self, value, expression, connection):
             if value is None:
                 return None
-            return   json.loads(value, **self.decoder_kwargs)
+            elif connection.vendor == 'postgresql' and self.decoder_kwargs.get('cls') is None:
+                return value
+            return json.loads(value, **self.decoder_kwargs)
     else:
         def from_db_value(self, value, expression, connection, context):
             if value is None:
                 return None
+            elif connection.vendor == 'postgresql' and self.decoder_kwargs.get('cls') is None:
+                return value
             return json.loads(value, **self.decoder_kwargs)
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
@@ -101,6 +105,12 @@ class JSONField(models.Field):
                 return ""
             return None
         return json.dumps(value, **self.encoder_kwargs)
+
+    def select_format(self, compiler, sql, params):
+        if compiler.connection.vendor == 'postgresql' and self.decoder_kwargs.get('cls') is not None:
+            # Avoid psycopg2's automatic decoding to allow custom decoder
+            return '%s::text' % sql, params
+        return super().select_format(compiler, sql, params)
 
     def value_to_string(self, obj):
         return self.value_from_object(obj)
@@ -185,20 +195,3 @@ class TypedJSONField(JSONField):
                     v(item)
             else:
                 v(value)
-
-
-def configure_database_connection(connection, **kwargs):
-    if connection.vendor != 'postgresql':
-        return
-
-    # Ensure that psycopg does not do JSON decoding under the hood
-    # We want to be able to do our own decoding with our own options
-    import psycopg2.extras
-    if hasattr(psycopg2.extras, 'register_default_jsonb'):
-        psycopg2.extras.register_default_jsonb(
-            connection.connection,
-            globally=False,
-            loads=lambda x: x)
-
-
-connection_created.connect(configure_database_connection)

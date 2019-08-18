@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import JSONField as PostgresJSONField
 from django.db import models
 from jsonfield.fields import JSONField
 
@@ -26,6 +27,14 @@ class BlankJSONFieldTestModel(models.Model):
 
 class CallableDefaultModel(models.Model):
     json = JSONField(default=lambda: {'x': 2})
+
+    class Meta:
+        app_label = 'jsonfield'
+
+
+class PostgresParallelModel(models.Model):
+    library_json = JSONField()
+    postgres_json = PostgresJSONField()
 
     class Meta:
         app_label = 'jsonfield'
