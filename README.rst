@@ -133,6 +133,18 @@ To run the tests fully, you will need to install tox.
 History
 -------
 
+1.3.0 (2019-04-28)
+~~~~~~~~~~~~~~~~~~
+
+* Work in parallel with ``django.contrib.postgres.fields.JSONField`` by
+  removing registration of default JSONB function and instead using Postgres'
+  cast-to-text in SQL
+  (`PR #14 <https://github.com/adamchainz/django-jsonfield/pull/14>`__).
+
+  This should allow you to move to the better supported
+  ``django.contrib.postgres.fields.JSONField``, and then Django 3.0's upcoming
+  all-database ``JSONField``.
+
 1.2.0 (2019-04-28)
 ~~~~~~~~~~~~~~~~~~
 
