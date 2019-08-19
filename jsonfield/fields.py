@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import models
 from django.db.models.lookups import Exact, IExact, In, Contains, IContains
-from django.db.backends.signals import connection_created
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 
@@ -110,7 +109,7 @@ class JSONField(models.Field):
         if compiler.connection.vendor == 'postgresql' and self.decoder_kwargs.get('cls') is not None:
             # Avoid psycopg2's automatic decoding to allow custom decoder
             return '%s::text' % sql, params
-        return super().select_format(compiler, sql, params)
+        return super(JSONField, self).select_format(compiler, sql, params)
 
     def value_to_string(self, obj):
         return self.value_from_object(obj)
