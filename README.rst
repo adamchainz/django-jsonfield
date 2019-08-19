@@ -133,7 +133,13 @@ To run the tests fully, you will need to install tox.
 History
 -------
 
-1.3.0 (2019-04-28)
+1.3.1 (2019-08-19)
+~~~~~~~~~~~~~~~~~~
+
+* Fix Python 2 compatilibity from change in 1.3.0
+  (`PR #16 <https://github.com/adamchainz/django-jsonfield/pull/16>`__).
+
+1.3.0 (2019-08-18)
 ~~~~~~~~~~~~~~~~~~
 
 * Work in parallel with ``django.contrib.postgres.fields.JSONField`` by
