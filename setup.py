@@ -24,13 +24,12 @@ setup(
     include_package_data=True,
     test_suite='tests.main',
     install_requires=[
-        'Django>=1.9',
+        'Django>=1.11',
+        'six',
     ],
     classifiers=[
         "Development Status :: 6 - Mature",
         'Framework :: Django',
-        "Framework :: Django :: 1.9",
-        "Framework :: Django :: 1.10",
         "Framework :: Django :: 1.11",
         "Framework :: Django :: 2.0",
         "Framework :: Django :: 2.1",

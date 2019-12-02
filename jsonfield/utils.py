@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils import six
+import six
 
 
 class TZAwareJSONEncoder(DjangoJSONEncoder):
