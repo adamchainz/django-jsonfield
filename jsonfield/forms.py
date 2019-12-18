@@ -1,7 +1,7 @@
 import json
 
 from django import forms
-from django.utils import six
+import six
 
 from .widgets import JSONWidget
 
