@@ -133,6 +133,11 @@ To run the tests fully, you will need to install tox.
 History
 -------
 
+1.4.0 (2019-12-18)
+~~~~~~~~~~~~~~~~~~
+
+* Django 3.0 compatbility. This required adding ``six`` as a dependency.
+
 1.3.1 (2019-08-19)
 ~~~~~~~~~~~~~~~~~~
 
