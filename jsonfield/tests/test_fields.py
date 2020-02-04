@@ -168,9 +168,9 @@ class JSONFieldTest(DjangoTestCase):
     @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL-specific test')
     def test_work_parallel_with_postgres_json_field(self):
         data = {'foo': 'bar'}
-        obj = PostgresParallelModel.objects.create(library_json=data, postgres_json=data)
+        obj = PostgresParallelModel.objects.create(library_json=data, postgres_text_json=data, postgres_json=data)
         obj = PostgresParallelModel.objects.get(id=obj.id)
-        self.assertEqual(obj.library_json, obj.postgres_json)
+        self.assertEqual(obj.library_json, obj.postgres_text_json, obj.postgres_json)
 
 
 class SavingModelsTest(DjangoTestCase):

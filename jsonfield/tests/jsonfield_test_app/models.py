@@ -34,6 +34,7 @@ class CallableDefaultModel(models.Model):
 
 class PostgresParallelModel(models.Model):
     library_json = JSONField()
+    postgres_text_json = JSONField(pg_text_type=True)
     postgres_json = PostgresJSONField()
 
     class Meta:

@@ -29,6 +29,8 @@ class JSONField(models.Field):
         self.encoder_kwargs = {
             'indent': kwargs.pop('indent', getattr(settings, 'JSONFIELD_INDENT', None)),
         }
+        # Set this to true when using postgresql with a text field
+        self.pg_text_type = kwargs.pop('pg_text_type', False)
         # This can be an object (probably a class), or a path which can be imported, resulting
         # in an object.
         encoder_class = kwargs.pop('encoder_class', getattr(settings, 'JSONFIELD_ENCODER_CLASS', None))
@@ -71,7 +73,7 @@ class JSONField(models.Field):
     def db_type(self, connection):
         if connection.vendor == 'postgresql':
             # Only do jsonb if in pg 9.4+
-            if connection.pg_version >= 90400:
+            if connection.pg_version >= 90400 and not self.pg_text_type:
                 return 'jsonb'
             return 'text'
         if connection.vendor == 'mysql':
@@ -80,20 +82,19 @@ class JSONField(models.Field):
             return 'long'
         return 'text'
 
+    def get_json_dict(self, value, connection):
+        if value is None:
+            return None
+        elif connection.vendor == 'postgresql' and self.decoder_kwargs.get('cls') is None and not self.pg_text_type:
+            return value
+        return json.loads(value, **self.decoder_kwargs)
+
     if django.VERSION > (2, 0):
         def from_db_value(self, value, expression, connection):
-            if value is None:
-                return None
-            elif connection.vendor == 'postgresql' and self.decoder_kwargs.get('cls') is None:
-                return value
-            return json.loads(value, **self.decoder_kwargs)
+            return self.get_json_dict(value, connection)
     else:
         def from_db_value(self, value, expression, connection, context):
-            if value is None:
-                return None
-            elif connection.vendor == 'postgresql' and self.decoder_kwargs.get('cls') is None:
-                return value
-            return json.loads(value, **self.decoder_kwargs)
+            return self.get_json_dict(value, connection)
 
     def get_db_prep_value(self, value, connection=None, prepared=None):
         return self.get_prep_value(value)
