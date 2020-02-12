@@ -4,6 +4,13 @@ django-jsonfield
 **Maintenance mode only:** It is not recommended you use this library on new
 projects. See the (long) **History** section below for why and alternatives.
 
+**Naming clarification:** This project is released on Pypi under the name
+`django-jsonfield <https://pypi.org/project/django-jsonfield/>`_.
+It should not be confused with the Pypi package
+`jsonfield <https://pypi.org/project/jsonfield/>`_,
+which has also been called django-jsonfield by some.
+
+
 ----
 
 Cross-database JSON field for Django models.
