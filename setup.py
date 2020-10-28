@@ -13,6 +13,7 @@ setup(
     version=version,
     description="JSONField for django models",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
     url="https://github.com/adamchainz/django-jsonfield",
     author="Matthew Schinckel",
     author_email="matt@schinckel.net",
