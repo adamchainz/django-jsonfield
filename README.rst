@@ -2,14 +2,17 @@ django-jsonfield
 ================
 
 **Maintenance mode only:** It is not recommended you use this library on new
-projects. See the (long) **History** section below for why and alternatives.
+projects. Django 3.1 includes a cross-database ``JSONField`` implementation -
+see its `release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#jsonfield-for-all-supported-database-backends>`__.
+You can use that field on older versions of Django with the
+`django-jsonfield-backport <https://pypi.org/project/django-jsonfield-backport/>`__
+package. See the (long) **History** section below for more information.
 
 **Naming clarification:** This project is released on Pypi under the name
 `django-jsonfield <https://pypi.org/project/django-jsonfield/>`_.
 It should not be confused with the Pypi package
 `jsonfield <https://pypi.org/project/jsonfield/>`_,
 which has also been called django-jsonfield by some.
-
 
 ----
 
@@ -31,38 +34,33 @@ at Mercurial and "everyone" uses GitHub these days.
 
 At the time it was created, the databases that Django supports didn't feature
 native JSON support. Since then, most of them have gained that ability.
-Correspondingly, there are some Django field implementations for taking
+Correspondingly, there were some Django field implementations for taking
 advantage of this:
 
-* A PostgreSQL ``JSONField`` is provided in
+* A PostgreSQL ``JSONField`` provided in
   `django.contrib.postgres <https://docs.djangoproject.com/en/2.1/ref/contrib/postgres/fields/>`_,
   which was created as part of Django in version 1.9, released December 2015.
   Note this library interferes with the way that works, see
   `issue 5 <https://github.com/adamchainz/django-jsonfield/issues/5>`_ for
   explanation and a workaround.
-* A MySQL (and maybe MariaDB) ``JSONField`` is provided in
+* A MySQL (and maybe MariaDB) ``JSONField`` provided in
   `Django-MySQL <https://django-mysql.readthedocs.io/en/latest/model_fields/json_field.html>`_,
   since version 1.0.7, released March 2016.
 
-At time of writing this history (March 2019), there still isn't a JSONField
-implementation that can take advantage of the native features on all the
-databases. This has been discussed on the ``django-developers`` mailing list
-several times though.
+Django 3.1, released August 2020, included a cross-database JSONField as one of
+its headline features (`release
+note <https://docs.djangoproject.com/en/3.1/releases/3.1/#jsonfield-for-all-supported-database-backends`__).
+The developer behind this package, Sage Abdullah, also released the code from
+Django 3.1 in the package
+`django-jsonfield-backport <https://pypi.org/project/django-jsonfield-backport/>`__.
 
-The ``JSONField`` provided by this library uses native features on
-PostgreSQL, but not on any other database, so it's in a bit of a weird place.
+**It is recommended** that you use Django 3.1 or django-jsonfield-backport
+instead of this package.
 
-If you are considering adding this to a new project, you probably don't want
-it, instead:
-
-* If you want native JSON support from your database and you're using
-  PostgreSQL or MySQL, use the native fields as per the links above.
-* If you don't want native JSON support, consider just storing the JSON in a
-  ``TextField`` and deserializing it appropriately in your code, perhaps with
-  a simple model property to proxy it.
-* If you need native JSON support on a database for which there is no Django
-  field implementation, try making it yourself or getting in touch to see if
-  there's something that can be done.
+Alternatively, if you don't need the ability to query the contents of your JSON
+in the database, consider storing the JSON in a ``TextField`` and deserializing
+it appropriately in your code, perhaps with a ``@property`` on your model class
+to proxy it.
 
 Installation
 ------------
