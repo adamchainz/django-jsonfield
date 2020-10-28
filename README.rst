@@ -49,7 +49,7 @@ advantage of this:
 
 Django 3.1, released August 2020, included a cross-database JSONField as one of
 its headline features (`release
-note <https://docs.djangoproject.com/en/3.1/releases/3.1/#jsonfield-for-all-supported-database-backends`__).
+note <https://docs.djangoproject.com/en/3.1/releases/3.1/#jsonfield-for-all-supported-database-backends>`__).
 The developer behind this package, Sage Abdullah, also released the code from
 Django 3.1 in the package
 `django-jsonfield-backport <https://pypi.org/project/django-jsonfield-backport/>`__.
