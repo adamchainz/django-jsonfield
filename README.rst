@@ -138,6 +138,12 @@ To run the tests fully, you will need to install tox.
 History
 -------
 
+1.4.1 (2020-10-28)
+~~~~~~~~~~~~~~~~~~
+
+* Added updated notes about Django 3.1's universal JSON field and its backport
+  package.
+
 1.4.0 (2019-12-18)
 ~~~~~~~~~~~~~~~~~~
 
