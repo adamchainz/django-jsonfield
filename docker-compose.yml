@@ -1,0 +1,27 @@
+services:
+    tox:
+        build:
+            context: .
+        environment:
+            - PIP_INDEX_URL=https://aws:${CODEARTIFACT_AUTH_TOKEN}@eventbrite-shared-353605023268.d.codeartifact.us-east-1.amazonaws.com/pypi/python/simple/
+            - MYSQL_TEST_ADDR=mysql
+            - MYSQL_TEST_PORT=3306
+            - MYSQL_TEST_USER=root
+            - MYSQL_TEST_PASSWORD=unitTestPassword
+        depends_on:
+            mysql:
+                condition: service_healthy
+            keys:
+                condition: service_started
+        volumes:
+            - keys:/etc/eventbrite/keys
+    keys:
+        image: 353605023268.dkr.ecr.us-east-1.amazonaws.com/keys-volume:master
+        command: ["/usr/bin/tail", "-f", "/dev/null"]
+        volumes:
+            - "keys:/etc/eventbrite/keys"
+    mysql:
+        image: 353605023268.dkr.ecr.us-east-1.amazonaws.com/mysql:mysql-57-b29e721
+
+volumes:
+    keys:

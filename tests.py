@@ -27,6 +27,8 @@ def main():
     global_settings.DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.{DB_ENGINE}'.format(**os.environ),
+            'HOST': os.environ.get('DB_HOST', ''),
+            'PORT': os.environ.get('DB_PORT', ''),
             'NAME': 'jsonfield-{DB_NAME}'.format(**os.environ),
             'USER': os.environ.get('DB_USER', ''),
             'PASSWORD': os.environ.get('DB_PASSWORD', ''),
@@ -49,6 +51,7 @@ def main():
     failures = test_runner.run_tests(['jsonfield'])
 
     sys.exit(failures)
+
 
 if __name__ == '__main__':
     main()

@@ -1,0 +1,160 @@
+version: 2.1
+
+orbs:
+  slack: circleci/slack@4.1.3
+
+executors:
+  small-docker:
+    docker:
+      - image: 353605023268.dkr.ecr.us-east-1.amazonaws.com/ci_cd:latest
+        aws_auth:
+          aws_access_key_id: $ECR35_AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $ECR35_AWS_SECRET_ACCESS_KEY
+    resource_class: small
+
+docker-ecr-login: &docker-ecr-login
+  name: Login docker to prod and dev ECR repositories
+  command: |
+      aws --profile=dev ecr get-login-password |  docker login -u AWS  --password-stdin https://353605023268.dkr.ecr.us-east-1.amazonaws.com
+      aws --profile=prod ecr get-login-password |  docker login -u AWS  --password-stdin https://552131502238.dkr.ecr.us-east-1.amazonaws.com
+
+generate-codeartifact-token: &generate-codeartifact-token
+  name: Generate temporary CodeArtifact Token
+  command: |
+      CODEARTIFACT_AUTH_TOKEN=$(aws --profile=dev codeartifact get-authorization-token --domain eventbrite-shared --domain-owner 353605023268 --query authorizationToken --output text)
+      echo "export CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN" >> $BASH_ENV
+
+jobs:
+  invoke-release:
+    executor:
+      name: small-docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Configure "prod" and "dev" AWS Profiles
+          command: /srv/ci_cd/configure_prod_dev_aws_profiles/main.sh
+      - run:
+          <<: *docker-ecr-login
+      - add_ssh_keys:
+          fingerprints:
+            - "36:a7:3b:83:9b:de:58:ca:ad:a1:c8:a8:f0:13:23:fe"
+      - run:
+          name: Git Config
+          command: /srv/ci_cd/git_config/main.sh
+      - run:
+          name: Release
+          command: |
+            /srv/ci_cd/release/main.sh \
+            --github-token=${GITHUB_TOKEN} \
+            --pull-request-url ${CIRCLE_PULL_REQUEST} \
+            --branch ${CIRCLE_BRANCH} \
+            --aws-access-key-id ${ECR35_AWS_ACCESS_KEY_ID} \
+            --aws-secret-access-key ${ECR35_AWS_SECRET_ACCESS_KEY} \
+            --publish-release-wheel=py37
+
+  test:
+    executor:
+      name: small-docker
+    parameters:
+      validate_pr:
+        type: boolean
+        default: true
+    steps:
+      - run:
+          name: Configure "prod" and "dev" AWS Profiles
+          command: /srv/ci_cd/configure_prod_dev_aws_profiles/main.sh
+      - when:
+          condition: << parameters.validate_pr >>
+          steps:
+            - run:
+                name: Check semantic version
+                command: |
+                  /srv/ci_cd/check_semantic_version/main.sh \
+                  --github-token=${GITHUB_TOKEN} \
+                  --pull-request-url ${CIRCLE_PULL_REQUEST}
+            - run:
+                name: Check cherry pick branch
+                command: |
+                  /srv/ci_cd/check_cherry_pick_branch/main.sh \
+                  --branch ${CIRCLE_BRANCH} \
+                  --github-token=${GITHUB_TOKEN} \
+                  --pull-request-url ${CIRCLE_PULL_REQUEST}
+      - checkout
+      - setup_remote_docker
+      - run:
+          <<: *docker-ecr-login
+      - run:
+          <<: *generate-codeartifact-token
+      - run:
+          name: Create test reports directory
+          command: mkdir /tmp/test-artifacts
+      - run:
+          name: Build images
+          command: |
+              echo "export STEP=\"Build images\"" >> $BASH_ENV
+              docker-compose build
+      - run:
+          name: Run tests
+          command: |
+              echo "export STEP=\"Run tests\"" >> $BASH_ENV
+              docker-compose run tox
+      - run:
+          name: Store test results
+          command: |
+            docker cp $(docker-compose ps -aq -- tox):/tmp/test-results /tmp/test-results
+            docker cp $(docker-compose ps -aq -- tox):/tmp/test-artifacts /tmp/test-artifacts || true
+          when: always
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-artifacts
+          destination: Test Result
+      - run:
+          name: Slack - Set PR URL
+          command: |
+            [[ ${CIRCLE_PULL_REQUEST} != "" ]] && echo "export PR_LNK=\"Github pull request: ${CIRCLE_PULL_REQUEST}\n\"" >> $BASH_ENV || true
+          when: always
+      - slack/notify:
+          channel: "common-libraries-circleci"
+          custom: '{"attachments":[{"color": "danger","mrkdwn_in": ["text"],"text": "Failed to build: *${CIRCLE_PROJECT_REPONAME}*\nUser: *${CIRCLE_USERNAME}*\n${PR_LNK}CircleCI build url: ${CIRCLE_BUILD_URL}\nFailed on Step: *${STEP}*"}]}'
+          event: fail
+      - slack/notify:
+          channel: "common-libraries-circleci"
+          custom: '{"attachments": [{"color": "good","mrkdwn_in": ["text"],"text": "Success to build: *${CIRCLE_PROJECT_REPONAME}*\nUser: *${CIRCLE_USERNAME}*\n${PR_LNK}CircleCI build url: ${CIRCLE_BUILD_URL}"}]}'
+          event: pass
+
+workflows:
+  version: 2
+  invoke-release-pull-request:
+    jobs:
+      - invoke-release:
+          context:
+            - 'DevTools ECR'
+            - 'Prod AWS'
+          filters:
+            branches:
+              only: /^invoke-release-.*-[0-9]+\.[0-9]+\.[0-9]+$/
+  main:
+    jobs:
+      - test:
+          name: test-main
+          validate_pr: false
+          context:
+            - 'DevTools ECR'
+            - 'Prod AWS'
+          filters:
+            branches:
+              only: main
+  pull-request:
+    jobs:
+      - test:
+          name: test-pull-request
+          context:
+            - 'DevTools ECR'
+            - 'Prod AWS'
+          filters:
+            branches:
+              ignore:
+                - main
+                - /^invoke-release-.*-[0-9]+\.[0-9]+\.[0-9]+$/

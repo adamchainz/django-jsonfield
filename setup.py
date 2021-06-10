@@ -25,12 +25,15 @@ setup(
     include_package_data=True,
     test_suite='tests.main',
     install_requires=[
-        'Django>=1.11',
+        'Django>=1.8',
+        'MySQL-python==1.2.5;python_version<"3.5"',
+        'mysqlclient==1.3.14;python_version>="3.5"',
         'six',
     ],
     classifiers=[
         "Development Status :: 6 - Mature",
         'Framework :: Django',
+        "Framework :: Django :: 1.8",
         "Framework :: Django :: 1.11",
         "Framework :: Django :: 2.0",
         "Framework :: Django :: 2.1",
