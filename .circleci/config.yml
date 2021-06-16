@@ -134,7 +134,7 @@ workflows:
             - 'Prod AWS'
           filters:
             branches:
-              only: /^invoke-release-.*-[0-9]+\.[0-9]+\.[0-9]+\+eventbrite$/%
+              only: /^invoke-release-.*-[0-9]+\.[0-9]+\.[0-9]+\+eventbrite$/
   main:
     jobs:
       - test:
@@ -157,4 +157,4 @@ workflows:
             branches:
               ignore:
                 - main
-                - /^invoke-release-.*-[0-9]+\.[0-9]+\.[0-9]+\+eventbrite$/%
+                - /^invoke-release-.*-[0-9]+\.[0-9]+\.[0-9]+\+eventbrite$/
