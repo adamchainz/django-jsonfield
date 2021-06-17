@@ -1,0 +1,5 @@
+
+1.4.2+eventbrite (2021-06-16)
+-----------------------------
+Python 3 compatibility
+
