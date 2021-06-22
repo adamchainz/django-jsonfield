@@ -16,7 +16,6 @@ try:
 except Exception as e:
     __version__ = 'dummy'
 
-
 setup(
     name="django-jsonfield",
     version=__version__,
