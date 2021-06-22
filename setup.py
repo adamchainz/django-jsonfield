@@ -1,9 +1,21 @@
 #!/usr/bin/env python
+import os
+import codecs
 from setuptools import setup
-from jsonfield.version import __version__
 
 with open("README.rst") as fp:
     long_description = fp.read()
+
+try:
+    with codecs.open(
+        os.path.join(os.path.dirname(__file__), 'jsonfield', 'version.txt'),
+        mode='rb',
+        encoding='utf8',
+    ) as _version_file:
+        __version__ = _version_file.read().strip()
+except Exception as e:
+    __version__ = 'dummy'
+
 
 setup(
     name="django-jsonfield",
