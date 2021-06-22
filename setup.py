@@ -1,16 +1,13 @@
 #!/usr/bin/env python
-import os
 from setuptools import setup
-
-with open(os.path.join(os.path.dirname(__file__), 'jsonfield', 'VERSION')) as fp:
-    version = fp.read().strip()
+from jsonfield.version import __version__
 
 with open("README.rst") as fp:
     long_description = fp.read()
 
 setup(
     name="django-jsonfield",
-    version=version,
+    version=__version__,
     description="JSONField for django models",
     long_description=long_description,
     long_description_content_type="text/x-rst",
